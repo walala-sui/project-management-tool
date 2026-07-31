@@ -1,0 +1,333 @@
+{
+  "id": "project-001",
+  "name": "3C超级快充产品开发",
+  "description": "120kW-240kW 3C快充一体双枪充电桩，从方案到量产全流程",
+  "startDate": "2026-05-01",
+  "endDate": "2026-12-31",
+  "tasks": [
+    {
+      "id": "t1",
+      "name": "方案设计阶段",
+      "parentId": null,
+      "resourceId": "r1",
+      "startDate": "2026-05-01",
+      "endDate": "2026-06-15",
+      "duration": 32,
+      "progress": 100,
+      "predecessors": [],
+      "level": 0,
+      "completed": true
+    },
+    {
+      "id": "t2",
+      "name": "市场需求调研",
+      "parentId": "t1",
+      "resourceId": "r8",
+      "startDate": "2026-05-01",
+      "endDate": "2026-05-20",
+      "duration": 14,
+      "progress": 100,
+      "predecessors": [],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t3",
+      "name": "竞品分析报告",
+      "parentId": "t1",
+      "resourceId": "r8",
+      "startDate": "2026-05-15",
+      "endDate": "2026-06-01",
+      "duration": 12,
+      "progress": 100,
+      "predecessors": [
+        "t2"
+      ],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t4",
+      "name": "技术方案评审",
+      "parentId": "t1",
+      "resourceId": "r1",
+      "startDate": "2026-06-01",
+      "endDate": "2026-06-15",
+      "duration": 11,
+      "progress": 100,
+      "predecessors": [
+        "t3"
+      ],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t5",
+      "name": "硬件开发",
+      "parentId": null,
+      "resourceId": "r1",
+      "startDate": "2026-06-16",
+      "endDate": "2026-10-31",
+      "duration": 98,
+      "progress": 100,
+      "predecessors": [
+        "t2"
+      ],
+      "level": 0,
+      "completed": true
+    },
+    {
+      "id": "t6",
+      "name": "主回路拓扑设计",
+      "parentId": "t5",
+      "resourceId": "r1",
+      "startDate": "2026-06-16",
+      "endDate": "2026-07-20",
+      "duration": 24,
+      "progress": 100,
+      "predecessors": [
+        "t1"
+      ],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t7",
+      "name": "功率器件选型",
+      "parentId": "t5",
+      "resourceId": "r2",
+      "startDate": "2026-07-01",
+      "endDate": "2026-08-10",
+      "duration": 29,
+      "progress": 100,
+      "predecessors": [
+        "t6"
+      ],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t9",
+      "name": "散热仿真验证",
+      "parentId": "t5",
+      "resourceId": "r1",
+      "startDate": "2026-08-14",
+      "endDate": "2026-09-18",
+      "duration": 33,
+      "progress": 100,
+      "predecessors": [
+        "t8"
+      ],
+      "level": 1,
+      "memberIds": [
+        "r1",
+        "r2",
+        "r3"
+      ],
+      "completed": true
+    },
+    {
+      "id": "t10",
+      "name": "样机打样调试",
+      "parentId": "t5",
+      "resourceId": "r6",
+      "startDate": "2026-09-15",
+      "endDate": "2026-10-31",
+      "duration": 33,
+      "progress": 0,
+      "predecessors": [
+        "t8",
+        "t9"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t11",
+      "name": "嵌入式软件开发",
+      "parentId": null,
+      "resourceId": "r3",
+      "startDate": "2026-07-01",
+      "endDate": "2026-11-15",
+      "duration": 99,
+      "progress": 40,
+      "predecessors": [
+        "t1"
+      ],
+      "level": 0
+    },
+    {
+      "id": "t12",
+      "name": "充电控制协议栈",
+      "parentId": "t11",
+      "resourceId": "r3",
+      "startDate": "2026-07-01",
+      "endDate": "2026-08-31",
+      "duration": 44,
+      "progress": 80,
+      "predecessors": [
+        "t1"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t13",
+      "name": "BMS通信模块",
+      "parentId": "t11",
+      "resourceId": "r4",
+      "startDate": "2026-08-15",
+      "endDate": "2026-10-15",
+      "duration": 44,
+      "progress": 20,
+      "predecessors": [
+        "t12"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t14",
+      "name": "APP端联调",
+      "parentId": "t11",
+      "resourceId": "r4",
+      "startDate": "2026-10-01",
+      "endDate": "2026-11-15",
+      "duration": 32,
+      "progress": 0,
+      "predecessors": [
+        "t13"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t15",
+      "name": "结构设计",
+      "parentId": null,
+      "resourceId": "r5",
+      "startDate": "2026-06-16",
+      "endDate": "2026-09-30",
+      "duration": 77,
+      "progress": 80,
+      "predecessors": [
+        "t1"
+      ],
+      "level": 0
+    },
+    {
+      "id": "t16",
+      "name": "整机3D建模",
+      "parentId": "t15",
+      "resourceId": "r5",
+      "startDate": "2026-06-16",
+      "endDate": "2026-07-31",
+      "duration": 32,
+      "progress": 100,
+      "predecessors": [
+        "t1"
+      ],
+      "level": 1,
+      "completed": true
+    },
+    {
+      "id": "t17",
+      "name": "防护等级验证",
+      "parentId": "t15",
+      "resourceId": "r5",
+      "startDate": "2026-08-01",
+      "endDate": "2026-09-15",
+      "duration": 32,
+      "progress": 60,
+      "predecessors": [
+        "t16"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t18",
+      "name": "模具开模跟进",
+      "parentId": "t15",
+      "resourceId": "r7",
+      "startDate": "2026-09-01",
+      "endDate": "2026-09-30",
+      "duration": 22,
+      "progress": 20,
+      "predecessors": [
+        "t17"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t19",
+      "name": "系统集成测试",
+      "parentId": null,
+      "resourceId": "r6",
+      "startDate": "2026-10-15",
+      "endDate": "2026-12-15",
+      "duration": 44,
+      "progress": 0,
+      "predecessors": [
+        "t5",
+        "t11",
+        "t15"
+      ],
+      "level": 0
+    },
+    {
+      "id": "t20",
+      "name": "功能完整性测试",
+      "parentId": "t19",
+      "resourceId": "r6",
+      "startDate": "2026-10-15",
+      "endDate": "2026-11-20",
+      "duration": 26,
+      "progress": 0,
+      "predecessors": [
+        "t5",
+        "t11",
+        "t15"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t21",
+      "name": "可靠性老化测试",
+      "parentId": "t19",
+      "resourceId": "r6",
+      "startDate": "2026-11-15",
+      "endDate": "2026-12-15",
+      "duration": 22,
+      "progress": 0,
+      "predecessors": [
+        "t20"
+      ],
+      "level": 1
+    },
+    {
+      "id": "t22",
+      "name": "量产准备",
+      "parentId": null,
+      "resourceId": "r1",
+      "startDate": "2026-11-15",
+      "endDate": "2026-12-31",
+      "duration": 34,
+      "progress": 0,
+      "predecessors": [
+        "t19"
+      ],
+      "level": 0
+    },
+    {
+      "id": "t23",
+      "name": "元器件采购清单确认(已延期)",
+      "parentId": "t5",
+      "resourceId": "r7",
+      "startDate": "2026-06-01",
+      "endDate": "2026-07-15",
+      "duration": 32,
+      "progress": 40,
+      "predecessors": [
+        "t6"
+      ],
+      "level": 1
+    }
+  ],
+  "status": "active"
+}

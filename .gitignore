@@ -1,0 +1,7 @@
+node_modules/
+*.msi
+*.zip
+.superpowers/
+*.jpg
+*.png
+.DS_Store

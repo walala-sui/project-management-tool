@@ -1,0 +1,254 @@
+[
+  {
+    "name": "3C超级快充产品开发模板",
+    "tasks": [
+      {
+        "name": "方案设计阶段",
+        "level": 0,
+        "parentId": null,
+        "duration": 32
+      },
+      {
+        "name": "市场需求调研",
+        "level": 1,
+        "parentId": "t1",
+        "duration": 14
+      },
+      {
+        "name": "竞品分析报告",
+        "level": 1,
+        "parentId": "t1",
+        "duration": 12
+      },
+      {
+        "name": "技术方案评审",
+        "level": 1,
+        "parentId": "t1",
+        "duration": 11
+      },
+      {
+        "name": "硬件开发",
+        "level": 0,
+        "parentId": null,
+        "duration": 98
+      },
+      {
+        "name": "主回路拓扑设计",
+        "level": 1,
+        "parentId": "t5",
+        "duration": 24
+      },
+      {
+        "name": "功率器件选型",
+        "level": 1,
+        "parentId": "t5",
+        "duration": 29
+      },
+      {
+        "name": "散热仿真验证",
+        "level": 1,
+        "parentId": "t5",
+        "duration": 33
+      },
+      {
+        "name": "样机打样调试",
+        "level": 1,
+        "parentId": "t5",
+        "duration": 33
+      },
+      {
+        "name": "嵌入式软件开发",
+        "level": 0,
+        "parentId": null,
+        "duration": 99
+      },
+      {
+        "name": "充电控制协议栈",
+        "level": 1,
+        "parentId": "t11",
+        "duration": 44
+      },
+      {
+        "name": "BMS通信模块",
+        "level": 1,
+        "parentId": "t11",
+        "duration": 44
+      },
+      {
+        "name": "APP端联调",
+        "level": 1,
+        "parentId": "t11",
+        "duration": 32
+      },
+      {
+        "name": "结构设计",
+        "level": 0,
+        "parentId": null,
+        "duration": 77
+      },
+      {
+        "name": "整机3D建模",
+        "level": 1,
+        "parentId": "t15",
+        "duration": 32
+      },
+      {
+        "name": "防护等级验证",
+        "level": 1,
+        "parentId": "t15",
+        "duration": 32
+      },
+      {
+        "name": "模具开模跟进",
+        "level": 1,
+        "parentId": "t15",
+        "duration": 22
+      },
+      {
+        "name": "系统集成测试",
+        "level": 0,
+        "parentId": null,
+        "duration": 44
+      },
+      {
+        "name": "功能完整性测试",
+        "level": 1,
+        "parentId": "t19",
+        "duration": 26
+      },
+      {
+        "name": "可靠性老化测试",
+        "level": 1,
+        "parentId": "t19",
+        "duration": 22
+      },
+      {
+        "name": "量产准备",
+        "level": 0,
+        "parentId": null,
+        "duration": 34
+      },
+      {
+        "name": "元器件采购清单确认(已延期)",
+        "level": 1,
+        "parentId": "t5",
+        "duration": 32
+      }
+    ],
+    "id": "tpl-1785463135105"
+  },
+  {
+    "name": "铁路接触网在线监测系统模板",
+    "tasks": [
+      {
+        "name": "需求分析与规格定义",
+        "level": 0,
+        "parentId": null,
+        "duration": 21
+      },
+      {
+        "name": "现场勘查调研",
+        "level": 1,
+        "parentId": "r1",
+        "duration": 11
+      },
+      {
+        "name": "技术规格书编写",
+        "level": 1,
+        "parentId": "r1",
+        "duration": 15
+      },
+      {
+        "name": "算法研发",
+        "level": 0,
+        "parentId": null,
+        "duration": 87
+      },
+      {
+        "name": "图像预处理算法",
+        "level": 1,
+        "parentId": "r4",
+        "duration": 32
+      },
+      {
+        "name": "线段化检测模型",
+        "level": 1,
+        "parentId": "r4",
+        "duration": 56
+      },
+      {
+        "name": "深度学习训练优化",
+        "level": 1,
+        "parentId": "r4",
+        "duration": 56
+      },
+      {
+        "name": "硬件平台搭建",
+        "level": 0,
+        "parentId": null,
+        "duration": 67
+      },
+      {
+        "name": "相机模组选型采购",
+        "level": 1,
+        "parentId": "r8",
+        "duration": 33
+      },
+      {
+        "name": "嵌入式主板设计",
+        "level": 1,
+        "parentId": "r8",
+        "duration": 43
+      },
+      {
+        "name": "结构外壳定制(已延期)",
+        "level": 1,
+        "parentId": "r8",
+        "duration": 32
+      },
+      {
+        "name": "系统联调",
+        "level": 0,
+        "parentId": null,
+        "duration": 44
+      },
+      {
+        "name": "室内联调测试",
+        "level": 1,
+        "parentId": "r12",
+        "duration": 22
+      },
+      {
+        "name": "现场装车测试",
+        "level": 1,
+        "parentId": "r12",
+        "duration": 22
+      },
+      {
+        "name": "文档与交付",
+        "level": 0,
+        "parentId": null,
+        "duration": 44
+      },
+      {
+        "name": "用户手册编写",
+        "level": 1,
+        "parentId": "r15",
+        "duration": 32
+      },
+      {
+        "name": "验收资料整理",
+        "level": 1,
+        "parentId": "r15",
+        "duration": 22
+      },
+      {
+        "name": "专利申请提交(已延期)",
+        "level": 1,
+        "parentId": "r4",
+        "duration": 18
+      }
+    ],
+    "id": "tpl-1785481037560"
+  }
+]

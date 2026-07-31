@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目管理工具 - 使用手册</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f0f2f5;color:#333;line-height:1.8}
+.hero{background:linear-gradient(135deg,#1a1a2e 0%,#2d3a5c 100%);color:#fff;text-align:center;padding:60px 20px 50px}
+.hero h1{font-size:36px;margin-bottom:8px}
+.hero p{font-size:16px;opacity:0.8;margin-bottom:20px}
+.hero .ver{display:inline-block;background:rgba(255,255,255,0.15);padding:4px 16px;border-radius:12px;font-size:13px}
+.container{max-width:960px;margin:0 auto;padding:40px 24px}
+h2{font-size:22px;color:#1a1a2e;margin:40px 0 16px;padding-bottom:10px;border-bottom:2px solid #e0e0e0}
+h3{font-size:17px;color:#1976d2;margin:24px 0 10px}
+p{margin:8px 0;font-size:14px}
+.card{background:#fff;border-radius:8px;padding:24px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+th{background:#f5f6f8;text-align:left;padding:10px 14px;font-weight:600;border-bottom:2px solid #e0e0e0}
+td{padding:8px 14px;border-bottom:1px solid #f0f0f0}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.bg{background:#e8f5e9;color:#2e7d32}
+.br{background:#ffebee;color:#c62828}
+.bb{background:#e3f2fd;color:#1565c0}
+.by{background:#fff8e1;color:#f57c00}
+code{background:#e8e8e8;padding:2px 6px;border-radius:3px;font-size:12px}
+.note{background:#e3f2fd;border-left:4px solid #1976d2;padding:12px 16px;margin:12px 0;font-size:13px;border-radius:0 6px 6px 0}
+.warn{background:#fff3e0;border-left:4px solid #f57c00;padding:12px 16px;margin:12px 0;font-size:13px;border-radius:0 6px 6px 0}
+ul,ol{padding-left:24px;font-size:14px}
+li{margin:4px 0}
+.steps{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.step{flex:1;min-width:180px;background:#fff;border-radius:8px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.step .num{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:50%;background:#1976d2;color:#fff;font-weight:700;font-size:16px;margin-bottom:8px}
+.step .title{font-weight:600;margin:4px 0}
+.step .desc{font-size:12px;color:#999}
+.footer{text-align:center;padding:40px;color:#999;font-size:12px;border-top:1px solid #e0e0e0;margin-top:40px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>项目管理工具</h1>
+  <p>轻量级项目进度与团队协作管理 — MS Project 风格</p>
+  <span class="ver">v1.0</span>
+</div>
+
+<div class="container">
+
+<h2>快速开始</h2>
+
+<div class="grid2">
+  <div class="card">
+    <h3>安装依赖</h3>
+    <p>在项目目录下运行：</p>
+    <code>npm install</code>
+    <p style="color:#999;font-size:12px;margin-top:4px">仅需安装一次，只需 Express 一个依赖</p>
+  </div>
+  <div class="card">
+    <h3>启动应用</h3>
+    <p>双击 <code>启动桌面应用.vbs</code></p>
+    <p style="color:#999;font-size:12px;margin-top:4px">静默启动，自动打开浏览器到 localhost:3000</p>
+  </div>
+</div>
+
+<div class="note"><strong>提示：</strong>停止服务双击 <code>停止服务器.bat</code></div>
+
+<h2>界面概览</h2>
+
+<div class="steps">
+  <div class="step"><div class="num">1</div><div class="title">看板</div><div class="desc">全局项目概览<br>延期风险预警</div></div>
+  <div class="step"><div class="num">2</div><div class="title">项目列表</div><div class="desc">创建/删除项目<br>进入详情管理</div></div>
+  <div class="step"><div class="num">3</div><div class="title">项目详情</div><div class="desc">任务层级 + 甘特图<br>核心工作区</div></div>
+  <div class="step"><div class="num">4</div><div class="title">人员视图</div><div class="desc">团队管理<br>跨项目任务汇总</div></div>
+</div>
+
+<h2>看板 — 风险预警</h2>
+<p>进入后默认显示看板，顶部统计卡片展示项目健康度。每个项目双进度条对比：</p>
+<ul>
+  <li><span class="badge bb">任务进度</span> 已完成任务占总任务比例</li>
+  <li><span class="badge by">时间进度</span> 已过天数占计划总天数的比例</li>
+</ul>
+<div class="warn">时间进度超过任务进度 20% 以上时，卡片标红预警。底部汇总表列出所有延期任务及其<strong>责任人和部门</strong>。</div>
+
+<h2>项目详情 — 核心工作区</h2>
+
+<h3>任务表格</h3>
+<table>
+  <tr><th>列</th><th>功能</th></tr>
+  <tr><td>#</td><td>单选框，选中后用工具栏操作</td></tr>
+  <tr><td>任务名称</td><td>双击编辑，层级缩进显示父子关系</td></tr>
+  <tr><td>负责人</td><td>下拉选择，来源于人员库</td></tr>
+  <tr><td>开始 / 结束</td><td>双击编辑，甘特图自动联动</td></tr>
+  <tr><td>时间进度</td><td>自动计算，红色=延期风险</td></tr>
+  <tr><td>前置任务</td><td>依赖的任务 ID</td></tr>
+  <tr><td>进度</td><td>点击切换：0→20→40→60→80→100</td></tr>
+  <tr><td>完成</td><td>100% 后可点击，自动归档</td></tr>
+</table>
+
+<h3>选中操作栏</h3>
+<p>选中任务后，顶部工具栏统一操作：</p>
+<table>
+  <tr><th>按钮</th><th>功能</th></tr>
+  <tr><td>→ 缩进</td><td>增加层级（设为子任务）</td></tr>
+  <tr><td>← 升级</td><td>减少层级</td></tr>
+  <tr><td>↑↓ 移动</td><td>调整排列顺序</td></tr>
+  <tr><td>删除</td><td>删除任务及子任务</td></tr>
+</table>
+<div class="note">缩进/升级/移动后<strong>选中保持</strong>，可连续操作。</div>
+
+<h3>完成归档</h3>
+<p>进度达 100% 后点击完成：</p>
+<ul>
+  <li>任务从活跃列表移至底部<strong>按月份折叠</strong></li>
+  <li>点击月份标题展开/收起</li>
+  <li>展开后有<strong>恢复</strong>按钮，可移回活跃列表</li>
+  <li>完成和恢复均<strong>自动保存</strong></li>
+</ul>
+
+<h3>甘特图</h3>
+<p>右侧面板 SVG 手绘甘特图：月份刻度、今天线、进度填充、编辑日期后自动更新。</p>
+
+<h2>人员视图</h2>
+<ul>
+  <li>按部门分组，支持<strong>部门和人员双筛选</strong></li>
+  <li>点击姓名 → 弹出跨项目甘特图</li>
+  <li>每人卡片右上角 <strong>+ 分配任务</strong> → 自动关联到项目</li>
+  <li>已完成任务按月份折叠</li>
+  <li><strong>编辑人员</strong>：新增/修改/删除</li>
+</ul>
+
+<h2>常见操作场景</h2>
+
+<div class="grid2">
+  <div class="card">
+    <h3>新项目启动</h3>
+    <ol>
+      <li>项目列表 → + 新建项目</li>
+      <li>进入详情 → + 添加任务</li>
+      <li>编辑名称、负责人、日期</li>
+      <li>选中 → 缩进调整层级</li>
+      <li>设前置依赖任务</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>周进度更新</h3>
+    <ol>
+      <li>打开项目详情</li>
+      <li>点击进度条更新</li>
+      <li>100% → 点击完成归档</li>
+      <li>查看甘特图确认时间线</li>
+      <li>保存修改</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>延期风险排查</h3>
+    <ol>
+      <li>看板查看红色延期任务</li>
+      <li>点击项目名定位问题</li>
+      <li>点击人员名看资源分配</li>
+      <li>调整排期或资源</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>分配任务给同事</h3>
+    <ol>
+      <li>人员视图 → 找到同事</li>
+      <li>+ 分配任务</li>
+      <li>选归属项目和起止日期</li>
+      <li>确认 → 自动写入项目</li>
+    </ol>
+  </div>
+</div>
+
+<h2>数据管理</h2>
+<div class="card">
+  <p><strong>所有数据以 JSON 文件存储</strong>在 <code>data/</code> 目录，可直接用记事本查看编辑。</p>
+  <p><strong>备份：</strong>复制 <code>data/</code> 文件夹</p>
+  <p><strong>恢复：</strong>覆盖回原位置</p>
+</div>
+
+<h2>部署到服务器</h2>
+<div class="note">
+  <ol>
+    <li>服务器安装 Node.js</li>
+    <li>复制整个文件夹</li>
+    <li><code>npm install</code> 安装依赖</li>
+    <li><code>node server.js</code> 或 pm2 守护进程</li>
+    <li>团队访问 <code>http://服务器IP:3000</code></li>
+  </ol>
+</div>
+
+<div class="footer">
+  <p>项目管理工具 v1.0 &copy; 2026</p>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,267 @@
+{
+  "id": "project-002",
+  "name": "铁路接触网在线监测系统",
+  "description": "车载前视铁轨轮廓线段化检测与接触网状态实时监控系统",
+  "startDate": "2026-04-01",
+  "endDate": "2026-10-31",
+  "tasks": [
+    {
+      "id": "r1",
+      "name": "需求分析与规格定义",
+      "parentId": null,
+      "resourceId": "r8",
+      "startDate": "2026-04-01",
+      "endDate": "2026-04-30",
+      "duration": 21,
+      "progress": 100,
+      "predecessors": [],
+      "level": 0,
+      "completed": false
+    },
+    {
+      "id": "r2",
+      "name": "现场勘查调研",
+      "parentId": "r1",
+      "resourceId": "r1",
+      "startDate": "2026-04-01",
+      "endDate": "2026-04-15",
+      "duration": 11,
+      "progress": 100,
+      "predecessors": [],
+      "level": 1,
+      "completed": false
+    },
+    {
+      "id": "r3",
+      "name": "技术规格书编写",
+      "parentId": "r1",
+      "resourceId": "r8",
+      "startDate": "2026-04-10",
+      "endDate": "2026-04-30",
+      "duration": 15,
+      "progress": 100,
+      "predecessors": [
+        "r2"
+      ],
+      "level": 1,
+      "completed": false
+    },
+    {
+      "id": "r4",
+      "name": "算法研发",
+      "parentId": null,
+      "resourceId": "r3",
+      "startDate": "2026-05-01",
+      "endDate": "2026-08-31",
+      "duration": 87,
+      "progress": 55,
+      "predecessors": [
+        "r1"
+      ],
+      "level": 0
+    },
+    {
+      "id": "r5",
+      "name": "图像预处理算法",
+      "parentId": "r4",
+      "resourceId": "r3",
+      "startDate": "2026-05-01",
+      "endDate": "2026-06-15",
+      "duration": 32,
+      "progress": 100,
+      "predecessors": [
+        "r1"
+      ],
+      "level": 1,
+      "completed": false
+    },
+    {
+      "id": "r6",
+      "name": "线段化检测模型",
+      "parentId": "r4",
+      "resourceId": "r3",
+      "startDate": "2026-05-15",
+      "endDate": "2026-07-31",
+      "duration": 56,
+      "progress": 60,
+      "predecessors": [
+        "r5"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r7",
+      "name": "深度学习训练优化",
+      "parentId": "r4",
+      "resourceId": "r4",
+      "startDate": "2026-06-15",
+      "endDate": "2026-08-31",
+      "duration": 56,
+      "progress": 20,
+      "predecessors": [
+        "r6"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r8",
+      "name": "硬件平台搭建",
+      "parentId": null,
+      "resourceId": "r1",
+      "startDate": "2026-05-15",
+      "endDate": "2026-08-15",
+      "duration": 67,
+      "progress": 70,
+      "predecessors": [
+        "r1"
+      ],
+      "level": 0
+    },
+    {
+      "id": "r9",
+      "name": "相机模组选型采购",
+      "parentId": "r8",
+      "resourceId": "r7",
+      "startDate": "2026-05-15",
+      "endDate": "2026-06-30",
+      "duration": 33,
+      "progress": 100,
+      "predecessors": [
+        "r1"
+      ],
+      "level": 1,
+      "completed": false
+    },
+    {
+      "id": "r10",
+      "name": "嵌入式主板设计",
+      "parentId": "r8",
+      "resourceId": "r2",
+      "startDate": "2026-06-01",
+      "endDate": "2026-07-31",
+      "duration": 43,
+      "progress": 80,
+      "predecessors": [
+        "r9"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r11",
+      "name": "结构外壳定制(已延期)",
+      "parentId": "r8",
+      "resourceId": "r5",
+      "startDate": "2026-06-01",
+      "endDate": "2026-07-15",
+      "duration": 32,
+      "progress": 50,
+      "predecessors": [
+        "r9"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r12",
+      "name": "系统联调",
+      "parentId": null,
+      "resourceId": "r6",
+      "startDate": "2026-08-15",
+      "endDate": "2026-10-15",
+      "duration": 44,
+      "progress": 0,
+      "predecessors": [
+        "r4",
+        "r8"
+      ],
+      "level": 0
+    },
+    {
+      "id": "r13",
+      "name": "室内联调测试",
+      "parentId": "r12",
+      "resourceId": "r6",
+      "startDate": "2026-08-15",
+      "endDate": "2026-09-15",
+      "duration": 22,
+      "progress": 0,
+      "predecessors": [
+        "r4",
+        "r8"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r14",
+      "name": "现场装车测试",
+      "parentId": "r12",
+      "resourceId": "r6",
+      "startDate": "2026-09-15",
+      "endDate": "2026-10-15",
+      "duration": 22,
+      "progress": 0,
+      "predecessors": [
+        "r13"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r15",
+      "name": "文档与交付",
+      "parentId": null,
+      "resourceId": "r8",
+      "startDate": "2026-09-01",
+      "endDate": "2026-10-31",
+      "duration": 44,
+      "progress": 0,
+      "predecessors": [
+        "r4",
+        "r8"
+      ],
+      "level": 0
+    },
+    {
+      "id": "r16",
+      "name": "用户手册编写",
+      "parentId": "r15",
+      "resourceId": "r8",
+      "startDate": "2026-09-01",
+      "endDate": "2026-10-15",
+      "duration": 32,
+      "progress": 0,
+      "predecessors": [
+        "r4",
+        "r8"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r17",
+      "name": "验收资料整理",
+      "parentId": "r15",
+      "resourceId": "r4",
+      "startDate": "2026-10-01",
+      "endDate": "2026-10-31",
+      "duration": 22,
+      "progress": 0,
+      "predecessors": [
+        "r16"
+      ],
+      "level": 1
+    },
+    {
+      "id": "r18",
+      "name": "专利申请提交(已延期)",
+      "parentId": "r4",
+      "resourceId": "r3",
+      "startDate": "2026-07-01",
+      "endDate": "2026-07-25",
+      "duration": 18,
+      "progress": 20,
+      "predecessors": [
+        "r6"
+      ],
+      "level": 1
+    }
+  ],
+  "status": "active"
+}

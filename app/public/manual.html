@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目管理工具 - 使用手册</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f6f8; color: #333; line-height: 1.7; }
+.sidebar { position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #1a1a2e; color: #fff; overflow-y: auto; padding: 24px 0; z-index: 100; }
+.sidebar h2 { font-size: 16px; padding: 0 20px; margin-bottom: 24px; }
+.sidebar a { display: block; color: #a0a0b8; text-decoration: none; padding: 8px 20px; font-size: 13px; border-left: 3px solid transparent; }
+.sidebar a:hover, .sidebar a.active { color: #fff; background: rgba(255,255,255,0.05); border-left-color: #4fc3f7; }
+.content { margin-left: 240px; padding: 40px 48px; max-width: 900px; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+h2 { font-size: 20px; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+h3 { font-size: 16px; margin: 20px 0 10px; color: #1976d2; }
+p { margin-bottom: 12px; font-size: 14px; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+th { background: #f0f1f3; text-align: left; padding: 10px 14px; font-weight: 600; border-bottom: 2px solid #ddd; }
+td { padding: 8px 14px; border-bottom: 1px solid #f0f0f0; }
+tr:last-child td { border-bottom: none; }
+code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+pre { background: #1a1a2e; color: #a0d0ff; padding: 16px; border-radius: 6px; font-size: 12px; overflow-x: auto; margin: 12px 0 20px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #e8f5e9; color: #2e7d32; }
+.badge-red { background: #ffebee; color: #c62828; }
+.badge-blue { background: #e3f2fd; color: #1565c0; }
+.note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 12px 0; font-size: 13px; border-radius: 0 6px 6px 0; }
+.shortcut { display: inline-block; background: #f0f0f0; border: 1px solid #ccc; padding: 3px 8px; border-radius: 3px; font-size: 11px; margin: 0 2px; }
+@media (max-width: 768px) { .sidebar { display: none; } .content { margin-left: 0; padding: 20px; } }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <h2>使用手册</h2>
+  <a href="#start">快速开始</a>
+  <a href="#dashboard">看板</a>
+  <a href="#projects">项目列表</a>
+  <a href="#detail">项目详情</a>
+  <a href="#tasks">任务操作</a>
+  <a href="#gantt">甘特图</a>
+  <a href="#personnel">人员视图</a>
+  <a href="#scenarios">常见场景</a>
+  <a href="#backup">数据备份</a>
+</nav>
+
+<div class="content">
+<h1>项目管理工具 — 使用手册</h1>
+<p style="color:#999;font-size:15px">适用于中小团队的项目进度与人员安排管理</p>
+
+<h2 id="start">快速开始</h2>
+
+<h3>启动方式</h3>
+<table>
+  <tr><th>方式</th><th>操作</th><th>说明</th></tr>
+  <tr><td><span class="badge badge-green">推荐</span></td><td>双击 <code>启动桌面应用.vbs</code></td><td>服务器静默启动，自动打开浏览器</td></tr>
+  <tr><td>命令行</td><td>双击 <code>启动服务器.bat</code></td><td>带命令行窗口，适合调试</td></tr>
+  <tr><td>手动</td><td><code>node server.js</code></td><td>终端启动，浏览器访问 localhost:3000</td></tr>
+</table>
+
+<div class="note">
+  <strong>首次使用：</strong>先运行 <code>npm install</code> 安装依赖（只需一次）。之后每次直接双击 VBS 即可。
+</div>
+
+<h2 id="dashboard">看板</h2>
+<p>进入工具后默认显示看板。顶部四个统计卡片：<strong>项目总数、总任务数、有风险项目数、风险任务数</strong>。</p>
+
+<p>每个项目一张卡片，双进度条对比：</p>
+<ul>
+  <li><strong style="color:#1976d2">蓝色</strong> = 任务完成进度（已完成任务数 / 总任务数）</li>
+  <li><strong style="color:#f57c00">橙色</strong> = 时间消耗进度（已过天数 / 计划总天数）</li>
+</ul>
+<p>当时间进度超过任务进度 20% 以上，卡片左侧出现<span style="color:#c62828;font-weight:600">红色边框</span>提示延期风险。</p>
+
+<h3>风险任务汇总表</h3>
+<p>底部列出所有延期或临近超期的任务，包含：</p>
+<ul>
+  <li><span class="badge badge-red">延期</span> — 结束日期已过，但进度不到 100%</li>
+  <li><span class="badge badge-blue">预警</span> — 时间进度超前任务进度 20% 以上</li>
+</ul>
+<p>每行显示：项目名（可点击跳转）、任务名、<strong>责任人、部门</strong>、结束日期、当前进度。</p>
+
+<h2 id="projects">项目列表</h2>
+<p>列出所有项目，每行显示项目名称（可点击进入详情）、起止日期、任务完成数和进度条。</p>
+<p>点击 <strong>+ 新建项目</strong> 创建新项目，填写名称、描述和起止日期。删除按钮移除项目（含所有任务）。</p>
+
+<h2 id="detail">项目详情</h2>
+<p>点击项目名进入核心工作区——左侧任务表格 + 右侧甘特图。</p>
+
+<h3>表格列说明</h3>
+<table>
+  <tr><th>列</th><th>功能</th></tr>
+  <tr><td>#</td><td>单选框，选中任务后工具栏操作</td></tr>
+  <tr><td>任务名称</td><td>双击编辑，层级缩进显示父子关系</td></tr>
+  <tr><td>负责人</td><td>下拉选择，来源于人员库</td></tr>
+  <tr><td>开始 / 结束</td><td>双击编辑日期，修改后甘特图自动更新</td></tr>
+  <tr><td>时间进度</td><td>自动计算已过天数占比。红色=延期风险</td></tr>
+  <tr><td>前置任务</td><td>依赖的任务 ID，逗号分隔</td></tr>
+  <tr><td>进度</td><td>点击进度条切换：0→20→40→60→80→100</td></tr>
+  <tr><td>完成</td><td>100% 时变为可点击，标记完成后任务归档</td></tr>
+</table>
+
+<h2 id="tasks">任务操作</h2>
+
+<h3>选中操作栏</h3>
+<p>点击行左侧单选框选中任务，然后使用工具栏按钮：</p>
+<table>
+  <tr><th>按钮</th><th>作用</th></tr>
+  <tr><td>→ 缩进</td><td>增加一层缩进，设为上方最近低层级任务的子任务</td></tr>
+  <tr><td>← 升级</td><td>减少一层缩进</td></tr>
+  <tr><td>↑ 上移 / ↓ 下移</td><td>调整任务在列表中的排列顺序</td></tr>
+  <tr><td>删除任务</td><td>删除选中任务及其所有子任务</td></tr>
+</table>
+<div class="note">缩进/升级/移动后<strong>选中状态保持</strong>，可以连续操作同一个任务。</div>
+
+<h3>进度与完成</h3>
+<p>点击进度条以 20% 为步进循环：<strong>0 → 20 → 40 → 60 → 80 → 100 → 0</strong></p>
+<p>到达 100% 后，完成按钮变为绿色可点击状态。</p>
+<p>点击<strong>完成</strong>后：</p>
+<ul>
+  <li>任务自动保存到磁盘</li>
+  <li>从活跃列表移除，移至表格底部的<strong>"已完成任务"折叠区</strong></li>
+  <li>按结束月份分组，默认折叠</li>
+</ul>
+<p>折叠区操作：</p>
+<ul>
+  <li>点击月份标题行 → 展开/收起该月已完成任务</li>
+  <li>展开后每个任务有<strong>恢复</strong>按钮 → 点击移回活跃列表</li>
+</ul>
+
+<h3>内联编辑</h3>
+<p>双击任务名称、日期、前置任务等单元格直接编辑。<span class="shortcut">Tab</span> 跳转到下一个可编辑单元格。</p>
+<p>编辑后顶部出现<strong>"保存修改"</strong>按钮，点击保存。标记完成/恢复<strong>自动保存</strong>。</p>
+
+<h2 id="gantt">甘特图</h2>
+<p>右侧面板实时显示任务时间线：</p>
+<ul>
+  <li>顶部显示月份刻度</li>
+  <li><span style="color:#e53935">红色虚线</span> = 今天的位置</li>
+  <li>不同层级任务不同颜色（蓝/绿/橙）</li>
+  <li>已完成的进度部分填充为绿色</li>
+  <li>编辑日期或进度后<strong>自动更新</strong></li>
+</ul>
+
+<h2 id="personnel">人员视图</h2>
+<p>按部门分组显示所有人员。顶部支持：</p>
+<ul>
+  <li><strong>部门筛选</strong> — 只显示特定部门成员</li>
+  <li><strong>人员筛选</strong> — 只显示特定人员</li>
+  <li><strong>编辑人员</strong> — 新增、编辑、删除人员</li>
+</ul>
+
+<h3>人员卡片</h3>
+<p>每张卡片显示：</p>
+<ul>
+  <li>姓名（可点击查看甘特图）</li>
+  <li>任务统计：总共 X 个，进行中 X 个，完成 X 个</li>
+  <li>活跃任务表格：项目、任务名、日期、进度</li>
+  <li>已完成任务按月份折叠（点击展开）</li>
+  <li><strong>+ 分配任务</strong> 按钮</li>
+</ul>
+
+<h3>人员甘特图</h3>
+<p>点击人员姓名弹出甘特图弹窗，显示该人员<strong>所有跨项目任务</strong>的时间分布。超期任务红色标记。</p>
+
+<h3>直接分配任务</h3>
+<p>点击卡片上的 + 分配任务 → 输入名称、选项目、选日期 → 确认。任务同时写入人员名下和对应项目中。</p>
+
+<h2 id="scenarios">常见操作场景</h2>
+
+<h3>场景一：新项目启动</h3>
+<ol>
+  <li>项目列表 → + 新建项目 → 填写名称和日期</li>
+  <li>进入详情 → + 添加任务 → 编辑名称、负责人、日期</li>
+  <li>选中任务 → 缩进/升级调整层级 → 设前置任务</li>
+  <li>右侧甘特图确认时间线</li>
+</ol>
+
+<h3>场景二：每周进度更新</h3>
+<ol>
+  <li>进入项目详情 → 逐个点击进度条更新</li>
+  <li>100% 的任务 → 点击完成归档</li>
+  <li>检查甘特图 → 保存修改</li>
+</ol>
+
+<h3>场景三：检查延期风险</h3>
+<ol>
+  <li>打开看板 → 查看红色延期任务</li>
+  <li>点击项目名跳转详情 → 定位问题</li>
+  <li>可点击人员名看甘特图了解资源占用</li>
+</ol>
+
+<h3>场景四：给同事分配工作</h3>
+<ol>
+  <li>人员视图 → 找到同事 → + 分配任务</li>
+  <li>选择归属项目和起止日期 → 确认</li>
+  <li>任务自动写入项目任务列表</li>
+</ol>
+
+<h3>场景五：月度项目复盘</h3>
+<ol>
+  <li>进入项目详情 → 查看底部已完成任务折叠区</li>
+  <li>按月份展开查看当月完成情况</li>
+  <li>看板检查整体健康度</li>
+</ol>
+
+<h2 id="backup">数据备份</h2>
+<p>所有数据以 JSON 文件存储在 <code>data/</code> 目录：</p>
+<ul>
+  <li><code>data/resources.json</code> — 人员库</li>
+  <li><code>data/projects/*.json</code> — 项目文件</li>
+</ul>
+<div class="note">
+  <strong>备份：</strong>复制整个 <code>data/</code> 文件夹。<br>
+  <strong>恢复：</strong>将备份的 <code>data/</code> 覆盖回来。
+</div>
+<p>JSON 格式可直接用记事本打开查看和编辑，方便应急处理。</p>
+
+<p style="margin-top:48px;color:#999;font-size:12px;text-align:center">项目管理工具 v1.0</p>
+</div>
+
+</body>
+</html>
