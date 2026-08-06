@@ -128,6 +128,38 @@ td[contenteditable="true"]:focus { outline: 2px solid #1976d2; background: #e3f2
 .tpl-card { background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center; }
 .tpl-card:hover { border-color:#1976d2; }
 .tpl-meta { font-size:12px;color:#999; }
+
+/* 四象限与人员看板 */
+.priority-badge, .task-type-badge, .person-flag { display:inline-block;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;line-height:1.4;margin-right:4px;white-space:nowrap; }
+.priority-q1 { background:#ffebee;color:#b71c1c; }
+.priority-q2 { background:#e3f2fd;color:#0d47a1; }
+.priority-q3 { background:#fff3e0;color:#e65100; }
+.priority-q4 { background:#f1f8e9;color:#33691e; }
+.priority-unset { background:#eeeeee;color:#666; }
+.task-type-badge { background:#f3e5f5;color:#6a1b9a; }
+.person-flag-bottleneck { background:#ffebee;color:#b71c1c; }
+.person-flag-load { background:#fff3e0;color:#e65100; }
+.person-flag-key { background:#e3f2fd;color:#0d47a1; }
+.quadrant-board { display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:12px;margin-bottom:18px; }
+.quadrant-cell { background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-top:4px solid #ddd;min-height:120px; }
+.quadrant-cell h4 { display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;font-size:14px; }
+.quadrant-cell-q1 { border-top-color:#c62828; }
+.quadrant-cell-q2 { border-top-color:#1976d2; }
+.quadrant-cell-q3 { border-top-color:#f57c00; }
+.quadrant-cell-q4 { border-top-color:#689f38; }
+.quadrant-item, .person-board-card { padding:8px 0;border-top:1px solid #f0f0f0;font-size:12px; }
+.quadrant-item:first-of-type, .person-board-card:first-of-type { border-top:none; }
+.dashboard-block { margin-top:24px; }
+.dashboard-block h3 { margin-bottom:12px;font-size:16px;color:#1a1a2e; }
+.person-board { display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px;margin-bottom:18px; }
+.person-board-col { background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+.person-board-col h4 { margin:0 0 10px;font-size:14px; }
+.quadrant-counts { display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;font-size:11px;color:#666; }
+.quadrant-counts span { background:#f5f6f8;border-radius:10px;padding:2px 7px; }
+@media (max-width: 900px) {
+  .quadrant-board, .person-board { grid-template-columns:1fr; }
+  .stats { flex-wrap:wrap;gap:12px; }
+}
 </style>
 </head>
 <body>
@@ -190,14 +222,16 @@ td[contenteditable="true"]:focus { outline: 2px solid #1976d2; background: #e3f2
           <th style="width:30px">#</th>
           <th style="width:50px">序号</th>
           <th style="width:18%">任务名称</th>
+          <th style="width:110px">优先级/标记</th>
           <th style="width:120px">负责人</th>
           <th style="width:110px">成员</th>
-          <th style="width:130px">开始</th>
-          <th style="width:130px">结束</th>
+          <th style="width:105px">开始</th>
+          <th style="width:105px">结束</th>
+          <th style="width:95px">实际完成</th>
           <th style="width:65px">时间进度</th>
           <th style="width:80px">前置任务</th>
           <th style="width:75px">进度</th>
-          <th style="width:50px">完成</th>
+          <th style="width:75px">状态</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -215,6 +249,13 @@ td[contenteditable="true"]:focus { outline: 2px solid #1976d2; background: #e3f2
     <label style="margin-left: 16px;">人员筛选：</label>
     <select id="person-filter" onchange="renderPersonnelView()">
       <option value="">全部人员</option>
+    </select>
+    <label style="margin-left: 16px;">人员属性：</label>
+    <select id="person-type-filter" onchange="renderPersonnelView()">
+      <option value="">全部人员</option>
+      <option value="bottleneck">卡点人员</option>
+      <option value="load">负荷人员</option>
+      <option value="key">关键人员</option>
     </select>
     <label style="margin-left: 16px;">时间范围：</label>
     <input type="date" id="export-start" style="width:130px" placeholder="开始日期" onchange="renderPersonnelView()">
@@ -256,7 +297,20 @@ td[contenteditable="true"]:focus { outline: 2px solid #1976d2; background: #e3f2
       <div id="tpl-list" style="font-size:13px"></div>
     </div>
 
-    <h3 style="margin-bottom:16px;margin-top:24px">IP 白名单管理</h3>
+    <h3>看板设置</h3>
+    <div class="settings-card" style="margin-bottom:20px">
+      <p style="color:#999;font-size:13px;margin-bottom:12px">设置任务四象限展示上限，以及自动识别负荷/关键人员的阈值。人工标记可以与自动判定同时生效。</p>
+      <div class="form-row"><label>Q1展示数</label><input type="number" id="set-q1" min="1" max="50"></div>
+      <div class="form-row"><label>Q2展示数</label><input type="number" id="set-q2" min="1" max="50"></div>
+      <div class="form-row"><label>Q3展示数</label><input type="number" id="set-q3" min="1" max="50"></div>
+      <div class="form-row"><label>Q4展示数</label><input type="number" id="set-q4" min="1" max="50"></div>
+      <div class="form-row"><label>负荷Q1阈值</label><input type="number" id="set-load" min="1" max="50"></div>
+      <div class="form-row"><label>关键Q1阈值</label><input type="number" id="set-key" min="1" max="50"></div>
+      <div class="form-row"><label>关键卡点阈值</label><input type="number" id="set-bottleneck" min="1" max="50"></div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="saveDashboardSettings()">保存看板设置</button></div>
+    </div>
+
+    <h3 style="margin-bottom:16px">IP 白名单管理</h3>
     <p style="color:#999;font-size:13px;margin-bottom:16px">白名单外的IP将无法访问本系统。支持单个IP(192.168.1.100)和CIDR网段(192.168.1.0/24)。本地访问始终不受限制。</p>
     <div class="settings-card">
       <div style="display:flex;gap:8px;margin-bottom:16px">
@@ -281,6 +335,8 @@ td[contenteditable="true"]:focus { outline: 2px solid #1976d2; background: #e3f2
     </label>
   </div>
   <div id="dashboard-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px"></div>
+  <div id="dashboard-quadrants"></div>
+  <div id="dashboard-people"></div>
   <div id="risk-section" style="margin-top:24px"></div>
 </div>
 
@@ -321,7 +377,13 @@ let state = {
   dirty: false,
   selectedIdx: -1,
   ganttProjectId: null,
-  ganttProjectName: ''
+  ganttProjectName: '',
+  dashboardSettings: {
+    quadrantTaskLimits: { q1: 10, q2: 8, q3: 8, q4: 5 },
+    loadQ1Threshold: 5,
+    keyQ1Threshold: 3,
+    keyBottleneckThreshold: 1
+  }
 };
 
 // ===== 页面切换 =====
@@ -371,6 +433,143 @@ async function api(url, options) {
   return res.json();
 }
 
+// ===== 四象限与数据兼容 =====
+const PRIORITY_QUADRANTS = {
+  q1: { label: '重要且紧急', short: 'Q1', cls: 'priority-q1' },
+  q2: { label: '重要不紧急', short: 'Q2', cls: 'priority-q2' },
+  q3: { label: '紧急不重要', short: 'Q3', cls: 'priority-q3' },
+  q4: { label: '不重要不紧急', short: 'Q4', cls: 'priority-q4' },
+  unset: { label: '未设置', short: '未设', cls: 'priority-unset' }
+};
+const QUADRANT_ORDER = ['q1', 'q2', 'q3', 'q4', 'unset'];
+
+function normalizeQuadrant(value) {
+  return PRIORITY_QUADRANTS[value] ? value : 'unset';
+}
+
+function quadrantOptionsHTML(value) {
+  const cur = normalizeQuadrant(value);
+  return QUADRANT_ORDER.map(k => `<option value="${k}" ${cur===k?'selected':''}>${PRIORITY_QUADRANTS[k].short} ${PRIORITY_QUADRANTS[k].label}</option>`).join('');
+}
+
+function quadrantBadge(value) {
+  const key = normalizeQuadrant(value);
+  const q = PRIORITY_QUADRANTS[key];
+  return `<span class="priority-badge ${q.cls}" title="${q.label}">${q.short} ${q.label}</span>`;
+}
+
+function taskTypeBadges(t) {
+  return `${t.isBottleneck ? '<span class="task-type-badge">卡点</span>' : ''}${t.isMilestone ? '<span class="task-type-badge">里程碑</span>' : ''}`;
+}
+
+function normalizeTask(t = {}) {
+  return {
+    ...t,
+    id: t.id || 't' + Date.now() + Math.random().toString(36).slice(2, 8),
+    name: t.name || '未命名任务',
+    parentId: t.parentId || null,
+    resourceId: t.resourceId || '',
+    memberIds: Array.isArray(t.memberIds) ? t.memberIds : [],
+    startDate: t.startDate || '',
+    endDate: t.endDate || '',
+    duration: Math.max(1, parseInt(t.duration) || 1),
+    progress: Math.max(0, Math.min(100, parseInt(t.progress) || 0)),
+    predecessors: Array.isArray(t.predecessors) ? t.predecessors : [],
+    level: Math.max(0, Math.min(2, parseInt(t.level) || 0)),
+    completed: t.completed === true,
+    onHold: t.onHold === true,
+    actualCompletionDate: t.actualCompletionDate || '',
+    priorityQuadrant: normalizeQuadrant(t.priorityQuadrant),
+    isBottleneck: t.isBottleneck === true,
+    isMilestone: t.isMilestone === true
+  };
+}
+
+function normalizeProject(p = {}) {
+  return {
+    ...p,
+    schemaVersion: 2,
+    id: p.id || 'project-' + Date.now(),
+    name: p.name || '未命名项目',
+    description: p.description || '',
+    startDate: p.startDate || '',
+    endDate: p.endDate || '',
+    status: p.status || 'active',
+    priorityQuadrant: normalizeQuadrant(p.priorityQuadrant),
+    tasks: Array.isArray(p.tasks) ? p.tasks.map(normalizeTask) : []
+  };
+}
+
+function normalizeResource(r = {}) {
+  return {
+    ...r,
+    id: r.id || 'r' + Date.now() + Math.random().toString(36).slice(2, 8),
+    name: r.name || '未命名',
+    department: r.department || '未分组',
+    isLoadPerson: r.isLoadPerson === true,
+    isKeyPerson: r.isKeyPerson === true
+  };
+}
+
+function createDefaultTask(overrides = {}) {
+  return normalizeTask({
+    id: 't' + Date.now() + Math.random().toString(36).slice(2, 8),
+    name: '新任务',
+    parentId: null,
+    resourceId: '',
+    memberIds: [],
+    startDate: state.currentProject?.startDate || '',
+    endDate: '',
+    duration: 1,
+    progress: 0,
+    predecessors: [],
+    level: 0,
+    completed: false,
+    onHold: false,
+    actualCompletionDate: '',
+    priorityQuadrant: 'unset',
+    isBottleneck: false,
+    isMilestone: false,
+    ...overrides
+  });
+}
+
+function isDelayedTask(t, today = new Date()) {
+  const d = new Date(today); d.setHours(0,0,0,0);
+  return !t.completed && t.endDate && new Date(t.endDate) < d;
+}
+
+function isCurrentTask(t, today = new Date()) {
+  if (t.completed) return false;
+  const d = new Date(today); d.setHours(0,0,0,0);
+  if (!t.startDate || !t.endDate) return true;
+  return new Date(t.startDate) <= d && new Date(t.endDate) >= d;
+}
+
+function sortByPriorityAndDate(a, b) {
+  if ((b.isBottleneck?1:0) !== (a.isBottleneck?1:0)) return (b.isBottleneck?1:0) - (a.isBottleneck?1:0);
+  if ((b.isMilestone?1:0) !== (a.isMilestone?1:0)) return (b.isMilestone?1:0) - (a.isMilestone?1:0);
+  const qa = QUADRANT_ORDER.indexOf(normalizeQuadrant(a.priorityQuadrant));
+  const qb = QUADRANT_ORDER.indexOf(normalizeQuadrant(b.priorityQuadrant));
+  if (qa !== qb) return qa - qb;
+  return (a.endDate || '9999-12-31').localeCompare(b.endDate || '9999-12-31');
+}
+
+async function loadDashboardSettings() {
+  const data = await api('/api/settings/dashboard');
+  if (!data.error) state.dashboardSettings = data;
+  return state.dashboardSettings;
+}
+
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function getTaskStatus(t) {
+  if (t.completed) return { key: 'completed', label: '完成', cls: 'status-done' };
+  if (t.onHold) return { key: 'stalled', label: '搁置', cls: 'status-hold' };
+  if (t.progress === 0) return { key: 'pending', label: '待开始', cls: '' };
+  return { key: 'active', label: '进行中', cls: 'status-active' };
+}
+
 // ===== 项目列表 =====
 async function loadProjects() {
   state.projects = await api('/api/projects');
@@ -384,6 +583,7 @@ function projectRowHTML(p) {
   return `
     <tr>
       <td><a style="color:#1976d2;cursor:pointer;font-weight:600" onclick="showPage('project-detail','${p.id}')">${esc(p.name)}</a></td>
+      <td>${quadrantBadge(p.priorityQuadrant)}</td>
       <td>${p.startDate || '-'} ~ ${p.endDate || '-'}</td>
       <td>${p.completedTasks}/${p.totalTasks}</td>
       <td>
@@ -452,6 +652,7 @@ function renderProjectList() {
         <thead>
           <tr>
             <th>项目名称</th>
+            <th>优先级</th>
             <th>起止日期</th>
             <th>任务数</th>
             <th>整体进度</th>
@@ -459,7 +660,7 @@ function renderProjectList() {
             <th>操作</th>
           </tr>
         </thead>
-        <tbody>${sec.projects.map(p => projectRowHTML(p)).join('') || '<tr><td colspan="6" style="color:#999;text-align:center;padding:16px">暂无项目</td></tr>'}</tbody>
+        <tbody>${sec.projects.map(p => projectRowHTML(p)).join('') || '<tr><td colspan="7" style="color:#999;text-align:center;padding:16px">暂无项目</td></tr>'}</tbody>
       </table>`;
     container.appendChild(sectionDiv);
   });
@@ -502,6 +703,9 @@ function showProjectModal(editId) {
     <div class="form-row"><label>描述</label><input id="f-desc" value="${esc(proj?.description || '')}"></div>
     <div class="form-row"><label>开始日期</label><input type="date" id="f-start" value="${proj?.startDate || ''}"></div>
     <div class="form-row"><label>结束日期</label><input type="date" id="f-end" value="${proj?.endDate || ''}"></div>
+    <div class="form-row"><label>优先级</label>
+      <select id="f-priority">${quadrantOptionsHTML(proj?.priorityQuadrant)}</select>
+    </div>
     <div class="form-row" id="tpl-row"><label>项目模板</label>
       <select id="f-template" onchange="applyTemplate()">
         <option value="">不使用模板</option>
@@ -529,9 +733,8 @@ function showProjectModal(editId) {
     let tasks = proj?.tasks || [];
     // 新建项目时如果选了模板，使用模板任务
     if (!proj && state._selectedTemplateTasks) {
-      tasks = state._selectedTemplateTasks.map(t => ({
+      tasks = state._selectedTemplateTasks.map(t => createDefaultTask({
         ...t,
-        id: 't' + Date.now() + Math.random().toString(36).slice(2, 8),
         resourceId: '',
         memberIds: [],
         progress: 0,
@@ -547,6 +750,7 @@ function showProjectModal(editId) {
       startDate: document.getElementById('f-start').value,
       endDate: document.getElementById('f-end').value,
       status: document.getElementById('f-status').value,
+      priorityQuadrant: document.getElementById('f-priority').value,
       tasks
     };
     await api('/api/projects', { method: 'POST', body: JSON.stringify(data) });
@@ -558,6 +762,7 @@ function showProjectModal(editId) {
       state.currentProject.startDate = data.startDate;
       state.currentProject.endDate = data.endDate;
       state.currentProject.status = data.status;
+      state.currentProject.priorityQuadrant = data.priorityQuadrant;
       document.getElementById('detail-toolbar').querySelector('span').textContent = data.name;
     }
     loadProjects();
@@ -589,7 +794,10 @@ async function applyTemplate() {
       level: t.level || 0,
       duration: t.duration || 1,
       startDate: '',
-      endDate: ''
+      endDate: '',
+      priorityQuadrant: normalizeQuadrant(t.priorityQuadrant),
+      isBottleneck: t.isBottleneck === true,
+      isMilestone: t.isMilestone === true
     }));
     alert(`已选择模板"${tpl.name}"，共${tpl.tasks.length}个阶段任务。保存项目后任务将自动创建，只需分配人员和日期。`);
   }
@@ -605,7 +813,10 @@ async function saveAsTemplate() {
     name: t.name,
     level: t.level || 0,
     parentId: t.parentId || null,
-    duration: t.duration || (t.startDate && t.endDate ? Math.ceil((new Date(t.endDate) - new Date(t.startDate)) / (1000*60*60*24)) : 1)
+    duration: t.duration || (t.startDate && t.endDate ? Math.ceil((new Date(t.endDate) - new Date(t.startDate)) / (1000*60*60*24)) : 1),
+    priorityQuadrant: normalizeQuadrant(t.priorityQuadrant),
+    isBottleneck: t.isBottleneck === true,
+    isMilestone: t.isMilestone === true
   }));
   await api('/api/templates', {
     method: 'POST',
@@ -662,6 +873,7 @@ function taskRowHTML(t, i, resources, wbsMap, tasks) {
   const rowStyle = done ? 'opacity:0.5;text-decoration:line-through' : '';
   const canComplete = (t.progress || 0) >= 100;
   const wbsNum = wbsMap ? wbsMap[i] : '';
+  const st = getTaskStatus(t);
 
   // 前置任务：显示WBS序号而非原始ID
   const predDisplay = (t.predecessors||[]).map(pid => {
@@ -669,16 +881,25 @@ function taskRowHTML(t, i, resources, wbsMap, tasks) {
     return pidx >= 0 && wbsMap ? (wbsMap[pidx] || pid) : pid;
   }).join(',');
 
+  // 负责人搜索下拉：input + datalist
+  const resInputId = 'res-input-' + i;
+  const resListId = 'res-list-' + i;
+  const resDisplay = res ? (res.name + ' (' + res.department + ')') : '';
+
   return `
   <tr data-idx="${i}" style="cursor:pointer" class="${isSel ? 'selected' : ''}">
     <td style="text-align:center;${rowStyle}"><input type="radio" name="sel" ${isSel?'checked':''} onclick="event.stopPropagation();selectTask(${i})"></td>
     <td style="font-size:11px;color:#888;text-align:center;font-weight:600;${rowStyle}">${wbsNum}</td>
     <td class="task-l${t.level || 0}" contenteditable="true" data-field="name" data-idx="${i}" onclick="event.stopPropagation()" style="${rowStyle}">${esc(t.name)}</td>
-    <td contenteditable="false" data-field="resourceId" data-idx="${i}" onclick="event.stopPropagation()" style="${rowStyle}">
-      <select onchange="cellChange(${i},'resourceId',this.value)" style="width:100%;border:none;background:transparent;font-size:12px">
-        <option value="">未分配</option>
-        ${resources.map(r => `<option value="${r.id}" ${t.resourceId===r.id?'selected':''}>${r.name} (${r.department})</option>`).join('')}
+    <td style="${rowStyle};white-space:nowrap" onclick="event.stopPropagation()">
+      <select onchange="cellChange(${i},'priorityQuadrant',this.value)" style="border:none;background:transparent;font-size:11px;max-width:130px">
+        ${QUADRANT_ORDER.map(k => `<option value="${k}" ${normalizeQuadrant(t.priorityQuadrant)===k?'selected':''}>${PRIORITY_QUADRANTS[k].short} ${PRIORITY_QUADRANTS[k].label}</option>`).join('')}
       </select>
+      <span style="cursor:pointer;font-size:10px;margin-left:2px" onclick="cellChange(${i},'isBottleneck',${!t.isBottleneck});renderTaskTable();" title="切换卡点标记">${t.isBottleneck ? '🔴' : '⚫'}</span>
+      <span style="cursor:pointer;font-size:10px" onclick="cellChange(${i},'isMilestone',${!t.isMilestone});renderTaskTable();" title="切换里程碑标记">${t.isMilestone ? '◆' : '◇'}</span>
+    </td>
+    <td onclick="event.stopPropagation()" style="font-size:12px;${rowStyle}">
+      <span id="resource-display-${i}" style="cursor:pointer;color:${res ? '#1976d2' : '#ccc'}" onclick="showResourcePicker(${i})" title="点击选择负责人">${res ? esc(res.name + ' (' + res.department + ')') : '点击选择'}</span>
     </td>
     <td onclick="event.stopPropagation()" style="font-size:12px;${rowStyle}">
       <span id="members-display-${i}" style="cursor:pointer;color:${(t.memberIds||[]).length ? '#1976d2' : '#ccc'}" onclick="showMemberPicker(${i})" title="点击选择成员">${renderMemberNames(t.memberIds, resources)}</span>
@@ -689,6 +910,7 @@ function taskRowHTML(t, i, resources, wbsMap, tasks) {
     <td onclick="event.stopPropagation()" style="${rowStyle}">
       <input type="date" value="${t.endDate||''}" onchange="cellChange(${i},'endDate',this.value)" style="width:100%;border:none;background:transparent;font-size:12px;padding:0">
     </td>
+    <td style="font-size:11px;color:#888;text-align:center;${rowStyle}">${t.actualCompletionDate || '-'}</td>
     <td style="color:${timeColor};font-size:12px;cursor:default;${rowStyle}">${timePct}%</td>
     <td contenteditable="false" data-field="predecessors" data-idx="${i}" onclick="event.stopPropagation()" style="${rowStyle}">
       <select onchange="predecessorChange(${i},this)" style="width:100%;border:none;background:transparent;font-size:12px">
@@ -702,9 +924,11 @@ function taskRowHTML(t, i, resources, wbsMap, tasks) {
       </div><span>${t.progress||0}%</span>
     </td>
     <td style="text-align:center;${rowStyle}" onclick="event.stopPropagation()">
-      ${done ? `<button class="btn btn-sm btn-outline" onclick="completeTask(${i})" title="恢复为未完成">恢复</button>` :
-        canComplete ? `<button class="btn btn-sm btn-success" onclick="completeTask(${i})" title="标记完成">完成</button>` :
-        `<button class="btn btn-sm" disabled style="opacity:0.3" title="进度达到100%后才能完成">完成</button>`}
+      ${done
+        ? `<span class="status-badge status-done" style="cursor:pointer" onclick="completeTask(${i})" title="点击恢复为未完成">${st.label} ↩</span>`
+        : canComplete
+          ? `<span class="status-badge" style="background:#c8e6c9;color:#2e7d32;cursor:pointer" onclick="completeTask(${i})" title="点击标记完成">✓ 可完成</span>`
+          : `<span class="status-badge ${st.cls}" style="cursor:pointer" onclick="cycleTaskStatus(${i})" title="点击切换状态">${st.label}</span>`}
     </td>
   </tr>`;
 }
@@ -737,7 +961,7 @@ function renderTaskTable() {
       const group = completedByMonth[m];
       const clsName = 'fold-' + m.replace(/[^a-z0-9]/g, '');
       html += `<tr class="completed-sep" onclick="toggleFold('${clsName}',this)">
-        <td colspan="11">▶ ${m} — ${group.length}个已完成任务</td></tr>`;
+        <td colspan="13">▶ ${m} — ${group.length}个已完成任务</td></tr>`;
       group.forEach(ct => {
         html += `<tr class="${clsName} folded" data-idx="${ct.idx}">${taskRowHTML(tasks[ct.idx], ct.idx, resources, wbsMap, tasks)}</tr>`;
       });
@@ -793,6 +1017,7 @@ async function completeTask(idx) {
   const t = state.currentProject.tasks[idx];
   if (t.completed) {
     t.completed = false;
+    t.actualCompletionDate = '';
     state.dirty = false;
     document.getElementById('btn-save-task').style.display = 'none';
     await api(`/api/projects/${state.currentProject.id}`, { method: 'PUT', body: JSON.stringify(state.currentProject) });
@@ -801,6 +1026,7 @@ async function completeTask(idx) {
   }
   if ((t.progress||0) < 100) return alert('进度必须达到100%才能标记完成');
   t.completed = true;
+  t.actualCompletionDate = new Date().toISOString().slice(0, 10);
   state.selectedIdx = -1;
   state.dirty = false;
   document.getElementById('btn-save-task').style.display = 'none';
@@ -816,6 +1042,22 @@ function predecessorChange(idx, selectEl) {
 
 function cellChange(idx, field, value) {
   state.currentProject.tasks[idx][field] = value;
+  markDirty();
+}
+
+function resourceInputChange(idx, displayValue) {
+  const resources = state.resources || [];
+  // Try to match by "name (department)" format
+  const match = displayValue.match(/^(.+?)\s*\((.+?)\)$/);
+  let found = null;
+  if (match) {
+    found = resources.find(r => r.name === match[1] && r.department === match[2]);
+  }
+  if (!found) {
+    // Try exact name match
+    found = resources.find(r => r.name === displayValue.trim());
+  }
+  state.currentProject.tasks[idx].resourceId = found ? found.id : '';
   markDirty();
 }
 
@@ -835,20 +1077,7 @@ async function saveTasks() {
 
 function addTask() {
   const tasks = state.currentProject.tasks || [];
-  tasks.push({
-    id: 't' + Date.now(),
-    name: '新任务',
-    parentId: null,
-    resourceId: '',
-    memberIds: [],
-    startDate: state.currentProject.startDate || '',
-    endDate: '',
-    duration: 1,
-    progress: 0,
-    predecessors: [],
-    level: 0,
-    completed: false
-  });
+  tasks.push(createDefaultTask());
   markDirty();
   renderTaskTable();
 }
@@ -909,8 +1138,29 @@ function moveTask(idx, direction) {
 function cycleProgress(idx) {
   const tasks = state.currentProject.tasks;
   const current = tasks[idx].progress || 0;
-  const next = Math.floor(current / 20) * 20 + 20;
+  let next;
+  if (current === 0) next = 1;
+  else if (current === 1) next = 20;
+  else next = Math.floor(current / 20) * 20 + 20;
   tasks[idx].progress = next > 100 ? 0 : next;
+  markDirty();
+  renderTaskTable();
+}
+
+function cycleTaskStatus(idx) {
+  const t = state.currentProject.tasks[idx];
+  if (t.completed) return;
+  // Cycle: 待开始(progress=0,!onHold) → 进行中(progress>0,!onHold) → 搁置(onHold) → 待开始...
+  if (t.onHold) {
+    // 搁置 → 待开始/进行中 (clear onHold)
+    t.onHold = false;
+  } else if (t.progress === 0) {
+    // 待开始 → 进行中 (set progress to 1%)
+    t.progress = 1;
+  } else {
+    // 进行中 → 搁置
+    t.onHold = true;
+  }
   markDirty();
   renderTaskTable();
 }
@@ -947,6 +1197,45 @@ function doDelete() {
 
 function editProject() {
   showProjectModal(state.currentProject.id);
+}
+
+// ===== 甘特图共享工具 =====
+function ganttDateRange(tasks) {
+  let minDate = null, maxDate = null;
+  tasks.forEach(t => {
+    if (t.startDate) { const d = new Date(t.startDate); if (!minDate || d < minDate) minDate = d; }
+    if (t.endDate) { const d = new Date(t.endDate); if (!maxDate || d > maxDate) maxDate = d; }
+  });
+  if (!minDate) minDate = new Date();
+  if (!maxDate) maxDate = new Date();
+  return { minDate: new Date(minDate), maxDate: new Date(maxDate) };
+}
+
+function ganttMonthHeaders(minDate, maxDate, width, dayWidthOrFn, leftPad, rowH = 22) {
+  const months = [];
+  const cursor = new Date(minDate);
+  while (cursor <= maxDate) {
+    months.push(new Date(cursor));
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  let html = '';
+  months.forEach((m, i) => {
+    const getX = typeof dayWidthOrFn === 'function' ? dayWidthOrFn : (d) => leftPad + ((d - minDate) / (1000*60*60*24)) * dayWidthOrFn;
+    const startX = getX(m);
+    const endX = i < months.length - 1 ? getX(months[i + 1]) : width;
+    const w = endX - startX;
+    html += `<rect x="${startX}" y="0" width="${w}" height="${rowH}" fill="${i%2===0?'#e8ecf1':'#f5f6f8'}" stroke="#d0d0d0" stroke-width="0.5"/>`;
+    html += `<text x="${startX+w/2}" y="${rowH-5}" text-anchor="middle" font-size="13" font-weight="bold" fill="#444">${m.getFullYear()}年${m.getMonth()+1}月</text>`;
+  });
+  return html;
+}
+
+function ganttTodayLine(today, minDate, maxDate, dayWidthOrFn, leftPad, svgH, headerH = 22) {
+  if (today < minDate || today > maxDate) return '';
+  const getX = typeof dayWidthOrFn === 'function' ? dayWidthOrFn : (d) => leftPad + ((d - minDate) / (1000*60*60*24)) * dayWidthOrFn;
+  const tx = getX(today);
+  return `<line x1="${tx}" y1="${headerH}" x2="${tx}" y2="${svgH}" stroke="#e53935" stroke-width="2" stroke-dasharray="6,3"/>
+    <text x="${tx}" y="${headerH+12}" text-anchor="middle" font-size="11" fill="#e53935" font-weight="bold">今天</text>`;
 }
 
 // ===== 甘特图 =====
@@ -1079,15 +1368,9 @@ async function loadFullGantt(projectId) {
     return;
   }
 
-  let minDate = null, maxDate = null;
-  tasks.forEach(t => {
-    if (t.startDate) { const d = new Date(t.startDate); if (!minDate || d < minDate) minDate = d; }
-    if (t.endDate) { const d = new Date(t.endDate); if (!maxDate || d > maxDate) maxDate = d; }
-  });
-  if (!minDate) minDate = new Date();
-  if (!maxDate) maxDate = new Date();
-  minDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-  maxDate = new Date(maxDate.getFullYear(), maxDate.getMonth() + 2, 0);
+  const { minDate: rawMin, maxDate: rawMax } = ganttDateRange(tasks);
+  const minDate = new Date(rawMin.getFullYear(), rawMin.getMonth(), 1);
+  const maxDate = new Date(rawMax.getFullYear(), rawMax.getMonth() + 2, 0);
 
   const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
   const leftPad = 220;
@@ -1099,30 +1382,11 @@ async function loadFullGantt(projectId) {
 
   let svgHtml = `<svg width="${width}" height="${svgH}" viewBox="0 0 ${width} ${svgH}" style="width:100%;height:${svgH}px">`;
 
-  // 月份刻度
-  const months = [];
-  let cursor = new Date(minDate);
-  while (cursor <= maxDate) {
-    months.push(new Date(cursor));
-    cursor.setMonth(cursor.getMonth() + 1);
-  }
-  months.forEach((m, i) => {
-    const startX = leftPad + ((m - minDate) / (1000*60*60*24)) * dayWidth;
-    const endX = i < months.length - 1
-      ? leftPad + ((months[i+1] - minDate) / (1000*60*60*24)) * dayWidth
-      : width;
-    const w = endX - startX;
-    svgHtml += `<rect x="${startX}" y="0" width="${w}" height="22" fill="${i%2===0?'#f0f0f0':'#fafafa'}" stroke="#ddd" stroke-width="0.5"/>`;
-    svgHtml += `<text x="${startX+w/2}" y="15" text-anchor="middle" font-size="12" fill="#555">${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}</text>`;
-  });
-
-  // 今天线
+  // 月份刻度和今天线（使用共享函数）
+  const dayFn = (d) => leftPad + ((d - minDate) / (1000*60*60*24)) * dayWidth;
+  svgHtml += ganttMonthHeaders(minDate, maxDate, width, dayFn, leftPad, 22);
   const today = new Date();
-  if (today >= minDate && today <= maxDate) {
-    const todayX = leftPad + ((today - minDate) / (1000*60*60*24)) * dayWidth;
-    svgHtml += `<line x1="${todayX}" y1="22" x2="${todayX}" y2="${svgH}" stroke="#e53935" stroke-width="2" stroke-dasharray="6,3"/>`;
-    svgHtml += `<text x="${todayX}" y="40" text-anchor="middle" font-size="11" fill="#e53935" font-weight="bold">今天</text>`;
-  }
+  svgHtml += ganttTodayLine(today, minDate, maxDate, dayFn, leftPad, svgH, 22);
 
   // 任务条
   tasks.forEach((t, i) => {
@@ -1159,31 +1423,42 @@ function editTaskModal() {
   const resources = state.resources || [];
   const tasks = state.currentProject.tasks || [];
   const wbsMap = getWBS(tasks);
+  const res = resources.find(r => r.id === t.resourceId);
 
   document.getElementById('task-edit-content').innerHTML = `
     <div class="form-row"><label>任务名称</label><input id="te-name" value="${esc(t.name||'')}"></div>
     <div class="form-row"><label>负责人</label>
-      <select id="te-resource">
-        <option value="">未分配</option>
-        ${resources.map(r => `<option value="${r.id}" ${t.resourceId===r.id?'selected':''}>${r.name} (${r.department})</option>`).join('')}
-      </select>
+      <span id="te-resource-display" style="cursor:pointer;color:#1976d2;flex:1;padding:6px 10px;border:1px solid #d0d0d0;border-radius:4px;font-size:13px"
+        onclick="showResourcePickerInModal(${idx})">${esc(res ? (res.name + ' (' + res.department + ')') : '点击选择')}</span>
     </div>
     <div class="form-row"><label>成员</label>
       <div style="max-height:150px;overflow-y:auto;border:1px solid #d0d0d0;border-radius:4px;padding:8px;flex:1">
+        <input type="text" placeholder="输入筛选成员..." style="width:100%;padding:4px 8px;margin-bottom:6px;border:1px solid #d0d0d0;border-radius:4px;font-size:12px"
+          oninput="filterMemberListInModal(this, 'te-member-list')">
+        <div id="te-member-list">
         ${resources.map(r => `
-          <label style="display:block;font-size:13px;margin:2px 0;cursor:pointer">
+          <label class="member-item-row" data-search="${esc(r.name)}${esc(r.department)}" style="display:block;font-size:13px;margin:2px 0;cursor:pointer">
             <input type="checkbox" value="${r.id}" ${(t.memberIds||[]).includes(r.id)?'checked':''}
-              onchange="toggleTaskMember(${idx},'${r.id}',this.checked)"> ${r.name} (${r.department})
+              onchange="toggleTaskMember(${idx},'${r.id}',this.checked)"> ${esc(r.name)} (${esc(r.department)})
           </label>
         `).join('')}
+        </div>
       </div>
     </div>
     <div class="form-row"><label>开始日期</label><input type="date" id="te-start" value="${t.startDate||''}"></div>
     <div class="form-row"><label>结束日期</label><input type="date" id="te-end" value="${t.endDate||''}"></div>
+    <div class="form-row"><label>实际完成</label><input type="date" id="te-actual" value="${t.actualCompletionDate||''}" ${t.completed?'':'disabled'}><span style="font-size:11px;color:#999;margin-left:4px">完成时自动填写</span></div>
     <div class="form-row"><label>进度</label>
       <select id="te-progress">
         ${[0,20,40,60,80,100].map(v => `<option value="${v}" ${(t.progress||0)===v?'selected':''}>${v}%</option>`).join('')}
       </select>
+    </div>
+    <div class="form-row"><label>优先级</label><select id="te-priority">${quadrantOptionsHTML(t.priorityQuadrant)}</select></div>
+    <div class="form-row"><label>任务类型</label>
+      <div style="display:flex;gap:12px;align-items:center">
+        <label style="width:auto"><input type="checkbox" id="te-bottleneck" ${t.isBottleneck?'checked':''}> 卡点任务</label>
+        <label style="width:auto"><input type="checkbox" id="te-milestone" ${t.isMilestone?'checked':''}> 里程碑任务</label>
+      </div>
     </div>
     <div class="form-row"><label>前置任务</label>
       <select id="te-pred">
@@ -1204,10 +1479,14 @@ function editTaskModal() {
 
   document.getElementById('btn-save-task-edit').onclick = () => {
     t.name = document.getElementById('te-name').value.trim() || '未命名';
-    t.resourceId = document.getElementById('te-resource').value;
+    // 负责人已通过 picker 直接设置到 t.resourceId，无需额外解析
     t.startDate = document.getElementById('te-start').value;
     t.endDate = document.getElementById('te-end').value;
+    t.actualCompletionDate = document.getElementById('te-actual').value;
     t.progress = parseInt(document.getElementById('te-progress').value) || 0;
+    t.priorityQuadrant = normalizeQuadrant(document.getElementById('te-priority').value);
+    t.isBottleneck = document.getElementById('te-bottleneck').checked;
+    t.isMilestone = document.getElementById('te-milestone').checked;
     t.level = parseInt(document.getElementById('te-level').value) || 0;
     const predVal = document.getElementById('te-pred').value;
     t.predecessors = predVal ? [predVal] : [];
@@ -1256,18 +1535,23 @@ function showMemberPicker(idx) {
 
   document.querySelectorAll('.member-picker-panel').forEach(p => p.remove());
 
+  const filterId = 'member-filter-' + idx;
   const panel = document.createElement('div');
   panel.className = 'member-picker-panel';
-  panel.style.cssText = 'position:fixed;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,0.18);z-index:9999;max-height:260px;overflow-y:auto;min-width:200px';
+  panel.style.cssText = 'position:fixed;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,0.18);z-index:9999;max-height:320px;overflow-y:auto;min-width:220px';
   panel.innerHTML = `
     <div style="font-size:12px;color:#999;margin-bottom:6px">选择成员（可多选）</div>
-    ${resources.map(r => `
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5">
-        <input type="checkbox" value="${r.id}" ${(t.memberIds||[]).includes(r.id)?'checked':''}
-          onchange="toggleTaskMember(${idx},'${r.id}',this.checked);updateMemberDisplay(${idx})">
-        <span>${r.name}</span> <span style="color:#999;font-size:11px">${r.department}</span>
-      </label>
-    `).join('')}
+    <input id="${filterId}" type="text" placeholder="输入筛选人员..." style="width:100%;padding:4px 8px;margin-bottom:6px;border:1px solid #d0d0d0;border-radius:4px;font-size:12px"
+      oninput="filterMemberList('${filterId}','member-list-${idx}')">
+    <div id="member-list-${idx}" style="max-height:180px;overflow-y:auto">
+      ${resources.map(r => `
+        <label class="member-item-row" data-search="${esc(r.name)}${esc(r.department)}" style="display:flex;align-items:center;gap:6px;font-size:13px;padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5">
+          <input type="checkbox" value="${r.id}" ${(t.memberIds||[]).includes(r.id)?'checked':''}
+            onchange="toggleTaskMember(${idx},'${r.id}',this.checked);updateMemberDisplay(${idx})">
+          <span>${esc(r.name)}</span> <span style="color:#999;font-size:11px">${esc(r.department)}</span>
+        </label>
+      `).join('')}
+    </div>
     <div style="margin-top:6px;text-align:right">
       <button class="btn btn-sm btn-outline" onclick="this.closest('.member-picker-panel').remove()">关闭</button>
     </div>`;
@@ -1298,6 +1582,208 @@ function updateMemberDisplay(idx) {
   }
 }
 
+// ===== 负责人选择面板 =====
+function showResourcePicker(idx) {
+  const t = state.currentProject.tasks[idx];
+  const resources = state.resources || [];
+  const displayEl = document.getElementById('resource-display-' + idx);
+  if (!displayEl) return;
+
+  document.querySelectorAll('.member-picker-panel').forEach(p => p.remove());
+
+  const filterId = 'res-filter-' + idx;
+  const panel = document.createElement('div');
+  panel.className = 'member-picker-panel';
+  panel.style.cssText = 'position:fixed;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,0.18);z-index:9999;max-height:320px;overflow-y:auto;min-width:220px';
+  panel.innerHTML = `
+    <div style="font-size:12px;color:#999;margin-bottom:6px">选择负责人</div>
+    <input id="${filterId}" type="text" placeholder="输入筛选人员..." style="width:100%;padding:4px 8px;margin-bottom:6px;border:1px solid #d0d0d0;border-radius:4px;font-size:12px"
+      oninput="filterMemberList('${filterId}','res-list-${idx}')">
+    <div id="res-list-${idx}" style="max-height:200px;overflow-y:auto">
+      <div class="member-item-row" style="padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5;color:#999" onclick="selectResource(${idx},'');updateResourceDisplay(${idx})">
+        <span>未分配</span>
+      </div>
+      ${resources.map(r => `
+        <div class="member-item-row" data-search="${esc(r.name)}${esc(r.department)}" style="padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5;${t.resourceId===r.id?'background:#e3f2fd;font-weight:600':''}"
+          onclick="selectResource(${idx},'${r.id}');updateResourceDisplay(${idx})">
+          <span>${esc(r.name)}</span> <span style="color:#999;font-size:11px">${esc(r.department)}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:6px;text-align:right">
+      <button class="btn btn-sm btn-outline" onclick="this.closest('.member-picker-panel').remove()">关闭</button>
+    </div>`;
+
+  const rect = displayEl.getBoundingClientRect();
+  panel.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
+  panel.style.top = Math.min(rect.bottom + 4, window.innerHeight - 340) + 'px';
+
+  document.body.appendChild(panel);
+
+  setTimeout(() => {
+    document.addEventListener('click', function closePanel(e) {
+      if (!panel.contains(e.target) && e.target !== displayEl && !displayEl.contains(e.target)) {
+        panel.remove();
+        document.removeEventListener('click', closePanel);
+      }
+    });
+  }, 0);
+}
+
+function selectResource(idx, resourceId) {
+  state.currentProject.tasks[idx].resourceId = resourceId;
+  markDirty();
+}
+
+function showResourcePickerInModal(idx) {
+  const t = state.currentProject.tasks[idx];
+  const resources = state.resources || [];
+  const displayEl = document.getElementById('te-resource-display');
+  if (!displayEl) return;
+
+  document.querySelectorAll('.member-picker-panel').forEach(p => p.remove());
+
+  const filterId = 'te-res-filter';
+  const panel = document.createElement('div');
+  panel.className = 'member-picker-panel';
+  panel.style.cssText = 'position:fixed;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,0.18);z-index:10000;max-height:320px;overflow-y:auto;min-width:220px';
+  panel.innerHTML = `
+    <div style="font-size:12px;color:#999;margin-bottom:6px">选择负责人</div>
+    <input id="${filterId}" type="text" placeholder="输入筛选人员..." style="width:100%;padding:4px 8px;margin-bottom:6px;border:1px solid #d0d0d0;border-radius:4px;font-size:12px"
+      oninput="filterMemberList('${filterId}','te-res-list')">
+    <div id="te-res-list" style="max-height:200px;overflow-y:auto">
+      <div class="member-item-row" style="padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5;color:#999" onclick="selectResource(${idx},'');updateResourceDisplayInModal()">
+        <span>未分配</span>
+      </div>
+      ${resources.map(r => `
+        <div class="member-item-row" data-search="${esc(r.name)}${esc(r.department)}" style="padding:5px 0;cursor:pointer;border-bottom:1px solid #f5f5f5;${t.resourceId===r.id?'background:#e3f2fd;font-weight:600':''}"
+          onclick="selectResource(${idx},'${r.id}');updateResourceDisplayInModal()">
+          <span>${esc(r.name)}</span> <span style="color:#999;font-size:11px">${esc(r.department)}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:6px;text-align:right">
+      <button class="btn btn-sm btn-outline" onclick="this.closest('.member-picker-panel').remove()">关闭</button>
+    </div>`;
+
+  const rect = displayEl.getBoundingClientRect();
+  panel.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
+  panel.style.top = Math.min(rect.bottom + 4, window.innerHeight - 340) + 'px';
+
+  document.body.appendChild(panel);
+
+  setTimeout(() => {
+    document.addEventListener('click', function closePanel(e) {
+      if (!panel.contains(e.target) && e.target !== displayEl && !displayEl.contains(e.target)) {
+        panel.remove();
+        document.removeEventListener('click', closePanel);
+      }
+    });
+  }, 0);
+}
+
+function updateResourceDisplayInModal() {
+  const displayEl = document.getElementById('te-resource-display');
+  if (!displayEl) return;
+  // Find the current task state
+  const t = state.currentProject.tasks[state.selectedIdx];
+  const resources = state.resources || [];
+  const res = resources.find(r => r.id === t.resourceId);
+  displayEl.textContent = res ? (res.name + ' (' + res.department + ')') : '点击选择';
+  displayEl.style.color = res ? '#1976d2' : '#999';
+  // Don't close panel - user may want to change again
+  document.querySelectorAll('.member-picker-panel').forEach(p => p.remove());
+}
+
+function updateResourceDisplay(idx) {
+  const t = state.currentProject.tasks[idx];
+  const resources = state.resources || [];
+  const res = resources.find(r => r.id === t.resourceId);
+  const displayEl = document.getElementById('resource-display-' + idx);
+  if (displayEl) {
+    displayEl.textContent = res ? (res.name + ' (' + res.department + ')') : '点击选择';
+    displayEl.style.color = res ? '#1976d2' : '#ccc';
+  }
+  // Close panel
+  document.querySelectorAll('.member-picker-panel').forEach(p => p.remove());
+}
+
+function filterMemberList(filterInputId, listContainerId) {
+  const filterText = document.getElementById(filterInputId).value.toLowerCase();
+  const container = document.getElementById(listContainerId);
+  if (!container) return;
+  const items = container.querySelectorAll('.member-item-row');
+  items.forEach(item => {
+    const searchData = (item.dataset.search || '').toLowerCase();
+    item.style.display = searchData.includes(filterText) ? '' : 'none';
+  });
+}
+
+function filterMemberListInModal(inputEl, listContainerId) {
+  const filterText = inputEl.value.toLowerCase();
+  const container = document.getElementById(listContainerId);
+  if (!container) return;
+  const items = container.querySelectorAll('.member-item-row');
+  items.forEach(item => {
+    const searchData = (item.dataset.search || '').toLowerCase();
+    item.style.display = searchData.includes(filterText) ? '' : 'none';
+  });
+}
+
+function buildPersonnelMetrics(resources, projectDetails, settings = state.dashboardSettings) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const byPerson = new Map(resources.map(r => [r.id, {
+    resource: normalizeResource(r), tasks: [], total: 0, active: 0, delayed: 0, completed: 0,
+    current: 0, bottleneck: 0, milestone: 0, quadrants: { q1: 0, q2: 0, q3: 0, q4: 0, unset: 0 }
+  }]));
+  projectDetails.forEach(proj => {
+    normalizeProject(proj).tasks.forEach(task => {
+      // Collect all person IDs: resourceId + memberIds
+      const personIds = new Set();
+      if (task.resourceId) personIds.add(task.resourceId);
+      (task.memberIds || []).forEach(mid => personIds.add(mid));
+      personIds.forEach(pid => {
+        if (!byPerson.has(pid)) return;
+        const item = byPerson.get(pid);
+        const enriched = { ...task, projectName: proj.name, projectId: proj.id, _role: task.resourceId === pid ? '负责人' : '成员' };
+        item.tasks.push(enriched);
+        item.total++;
+        item.quadrants[normalizeQuadrant(task.priorityQuadrant)]++;
+        if (task.completed) item.completed++;
+        else {
+          item.active++;
+          if (isDelayedTask(task, today)) item.delayed++;
+          if (isCurrentTask(task, today)) item.current++;
+          if (task.isBottleneck) item.bottleneck++;
+        }
+        if (task.isMilestone) item.milestone++;
+      });
+    });
+  });
+  return [...byPerson.values()].map(item => {
+    const manualLoad = item.resource.isLoadPerson === true;
+    const manualKey = item.resource.isKeyPerson === true;
+    const autoLoad = item.quadrants.q1 >= (settings.loadQ1Threshold || 5);
+    const autoKey = item.quadrants.q1 >= (settings.keyQ1Threshold || 3) || item.bottleneck >= (settings.keyBottleneckThreshold || 1);
+    return {
+      ...item,
+      isBottleneckPerson: item.bottleneck > 0,
+      isLoadPerson: manualLoad || autoLoad,
+      isKeyPerson: manualKey || autoKey,
+      loadReason: manualLoad ? '人工标记' : (autoLoad ? `Q1任务 ${item.quadrants.q1}/${settings.loadQ1Threshold || 5}` : ''),
+      keyReason: manualKey ? '人工标记' : (autoKey ? 'Q1任务或卡点任务' : '')
+    };
+  });
+}
+
+function personFlagsHTML(metric) {
+  return `${metric.isBottleneckPerson ? '<span class="person-flag person-flag-bottleneck">卡点人员</span>' : ''}${metric.isLoadPerson ? `<span class="person-flag person-flag-load">负荷人员</span>` : ''}${metric.isKeyPerson ? '<span class="person-flag person-flag-key">关键人员</span>' : ''}`;
+}
+
+function quadrantCountsHTML(counts) {
+  return QUADRANT_ORDER.map(k => `<span>${PRIORITY_QUADRANTS[k].short} ${counts[k] || 0}</span>`).join('');
+}
+
 // ===== 人员视图 =====
 async function renderPersonnelView() {
   const resources = await api('/api/resources') || state.resources;
@@ -1305,28 +1791,29 @@ async function renderPersonnelView() {
   const activeProjects = projects.filter(p => (p.status || 'active') === 'active');
   const deptFilter = document.getElementById('dept-filter').value;
   const personFilter = document.getElementById('person-filter').value;
+  const personTypeFilter = document.getElementById('person-type-filter')?.value || '';
 
-  // 收集所有任务（仅进行中项目）
+  // 收集所有任务（仅进行中项目）- 批量获取避免N+1
+  let projectDetails = [];
   const allTasks = [];
-  for (const proj of activeProjects) {
-    const detail = await api(`/api/projects/${proj.id}`);
-    (detail.tasks || []).forEach(t => {
-      if (t.resourceId) {
-        allTasks.push({
-          projectName: proj.name,
-          projectId: proj.id,
-          ...t
-        });
-      }
+  await loadDashboardSettings();
+  const normalizedResources = resources.map(normalizeResource);
+  const activeIds2 = activeProjects.map(p => p.id).join(',');
+  projectDetails = activeIds2 ? (await api(`/api/projects/batch?ids=${activeIds2}`)).map(normalizeProject) : [];
+  for (const detail of projectDetails) {
+    detail.tasks.forEach(t => {
+      allTasks.push({ projectName: detail.name, projectId: detail.id, ...t });
     });
   }
+  const metrics = buildPersonnelMetrics(normalizedResources, projectDetails, state.dashboardSettings);
+  const metricMap = new Map(metrics.map(m => [m.resource.id, m]));
 
   // 部门列表
-  const departments = [...new Set(resources.map(r => r.department))];
+  const departments = [...new Set(normalizedResources.map(r => r.department))];
   document.getElementById('dept-filter').innerHTML = '<option value="">全部部门</option>' +
     departments.map(d => `<option value="${d}" ${d===deptFilter?'selected':''}>${d}</option>`).join('');
   document.getElementById('person-filter').innerHTML = '<option value="">全部人员</option>' +
-    resources.map(r => `<option value="${r.id}" ${r.id===personFilter?'selected':''}>${r.name}</option>`).join('');
+    normalizedResources.map(r => `<option value="${r.id}" ${r.id===personFilter?'selected':''}>${r.name}</option>`).join('');
 
   // 日期筛选
   const startFilter = document.getElementById('export-start').value;
@@ -1335,9 +1822,19 @@ async function renderPersonnelView() {
   const eFilter = endFilter ? new Date(endFilter) : null;
 
   // 筛选
-  let filteredResources = resources;
+  let filteredResources = normalizedResources;
   if (deptFilter) filteredResources = filteredResources.filter(r => r.department === deptFilter);
   if (personFilter) filteredResources = filteredResources.filter(r => r.id === personFilter);
+  if (personTypeFilter) {
+    filteredResources = filteredResources.filter(r => {
+      const m = metricMap.get(r.id);
+      if (!m) return false;
+      if (personTypeFilter === 'bottleneck') return m.isBottleneckPerson;
+      if (personTypeFilter === 'load') return m.isLoadPerson;
+      if (personTypeFilter === 'key') return m.isKeyPerson;
+      return true;
+    });
+  }
 
   // 按部门分组
   const deptGroups = {};
@@ -1352,7 +1849,9 @@ async function renderPersonnelView() {
     html += `<div class="dept-section"><div class="dept-title">${dept} (${members.length}人)</div>`;
     const today = new Date(); today.setHours(0,0,0,0);
     for (const member of members) {
-      let tasks = allTasks.filter(t => t.resourceId === member.id);
+      const metric = metricMap.get(member.id) || { quadrants: { q1:0,q2:0,q3:0,q4:0,unset:0 }, isBottleneckPerson:false, isLoadPerson:false, isKeyPerson:false, bottleneck:0, loadReason:'', keyReason:'' };
+      if (personTypeFilter && !({ bottleneck: metric.isBottleneckPerson, load: metric.isLoadPerson, key: metric.isKeyPerson }[personTypeFilter])) continue;
+      let tasks = allTasks.filter(t => t.resourceId === member.id || (t.memberIds && t.memberIds.includes(member.id)));
       // 日期范围筛选
       if (sFilter || eFilter) {
         tasks = tasks.filter(t => {
@@ -1367,20 +1866,27 @@ async function renderPersonnelView() {
       const delayedTasks = activeNotDone.filter(t => t.endDate && new Date(t.endDate) < today);
       const normalTasks = activeNotDone.filter(t => !t.endDate || new Date(t.endDate) >= today);
       const total = tasks.length;
+      const reasonText = [metric.isBottleneckPerson ? `卡点${metric.bottleneck}项` : '', metric.isLoadPerson ? metric.loadReason : '', metric.isKeyPerson ? metric.keyReason : ''].filter(Boolean).join('；');
       html += `<div class="person-card" id="card-${member.id}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h4 style="margin:0"><a style="color:#1976d2;cursor:pointer" onclick="showPersonGantt('${member.id}')" title="点击查看甘特图">${member.name}</a> — <span style="font-weight:normal;color:#999;font-size:13px">${total}个任务，进行中${normalTasks.length}个，<span style="color:#c62828">延期${delayedTasks.length}个</span>，完成${doneTasks.length}个</span></h4>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px;flex-wrap:wrap">
+          <div>
+            <h4 style="margin:0"><a style="color:#1976d2;cursor:pointer" onclick="showPersonGantt('${member.id}')" title="点击查看甘特图">${member.name}</a> — <span style="font-weight:normal;color:#999;font-size:13px">${total}个任务，进行中${normalTasks.length}个，<span style="color:#c62828">延期${delayedTasks.length}个</span>，完成${doneTasks.length}个</span></h4>
+            <div style="margin-top:5px">${personFlagsHTML(metric)}${reasonText ? `<span style="font-size:11px;color:#777">${esc(reasonText)}</span>` : ''}</div>
+            <div class="quadrant-counts">${quadrantCountsHTML(metric.quadrants)}</div>
+          </div>
           <button class="btn btn-sm btn-primary" onclick="showAssignTaskForm('${member.id}')">+ 分配任务</button>
         </div>`;
       if (tasks.length === 0) {
         html += '<p style="color:#999;font-size:13px">暂无分配任务</p>';
       } else {
-        html += `<table style="font-size:12px"><thead><tr><th>项目</th><th>任务</th><th>开始</th><th>结束</th><th>进度</th><th>前置</th></tr></thead><tbody>`;
+        html += `<table style="font-size:12px"><thead><tr><th>项目</th><th>任务</th><th>优先级/标记</th><th>开始</th><th>结束</th><th>进度</th><th>前置</th></tr></thead><tbody>`;
         // 正常进行中任务
         normalTasks.forEach(t => {
+          const isMember = t.resourceId !== member.id && (t.memberIds || []).includes(member.id);
           html += `<tr>
             <td><a style="color:#1976d2;cursor:pointer" onclick="showPage('project-detail','${t.projectId}')">${esc(t.projectName)}</a></td>
-            <td>${'　'.repeat(t.level || 0)}${esc(t.name)}</td>
+            <td>${'　'.repeat(t.level || 0)}${esc(t.name)}${isMember ? ' <span style="font-size:10px;color:#888;background:#f0f0f0;padding:1px 4px;border-radius:3px">成员</span>' : ''}</td>
+            <td>${quadrantBadge(t.priorityQuadrant)}${taskTypeBadges(t)}</td>
             <td>${t.startDate || '-'}</td>
             <td>${t.endDate || '-'}</td>
             <td>${t.progress || 0}%</td>
@@ -1389,12 +1895,14 @@ async function renderPersonnelView() {
         });
         // 延期任务分组
         if (delayedTasks.length > 0) {
-          html += `<tr style="background:#ffebee;cursor:default"><td colspan="6" style="padding:3px 8px;font-size:11px;color:#c62828;font-weight:600">⚠ 延期事项 (${delayedTasks.length}个)</td></tr>`;
+          html += `<tr style="background:#ffebee;cursor:default"><td colspan="7" style="padding:3px 8px;font-size:11px;color:#c62828;font-weight:600">⚠ 延期事项 (${delayedTasks.length}个)</td></tr>`;
           delayedTasks.forEach(t => {
             const daysLate = Math.ceil((today - new Date(t.endDate)) / (1000*60*60*24));
+            const isMemberDelayed = t.resourceId !== member.id && (t.memberIds || []).includes(member.id);
             html += `<tr style="background:#fff5f5">
               <td><a style="color:#1976d2;cursor:pointer" onclick="showPage('project-detail','${t.projectId}')">${esc(t.projectName)}</a></td>
-              <td>${'　'.repeat(t.level || 0)}${esc(t.name)}</td>
+              <td>${'　'.repeat(t.level || 0)}${esc(t.name)}${isMemberDelayed ? ' <span style="font-size:10px;color:#888;background:#f0f0f0;padding:1px 4px;border-radius:3px">成员</span>' : ''}</td>
+              <td>${quadrantBadge(t.priorityQuadrant)}${taskTypeBadges(t)}</td>
               <td>${t.startDate || '-'}</td>
               <td style="color:#c62828">${t.endDate || '-'}<br><span style="font-size:10px">超期${daysLate}天</span></td>
               <td>${t.progress || 0}%</td>
@@ -1415,11 +1923,13 @@ async function renderPersonnelView() {
           months.forEach(m => {
             const pcls = 'pcomp-' + memberId + '-' + m.replace(/[^a-z0-9]/g, '');
             html += `<tr style="background:#e8f5e9;cursor:pointer" onclick="personFoldToggle('${pcls}',this)">
-              <td colspan="6" style="padding:4px 12px;font-size:11px;color:#2e7d32">▶ ${m} — ${doneByMonth[m].length}个已完成</td></tr>`;
+              <td colspan="7" style="padding:4px 12px;font-size:11px;color:#2e7d32">▶ ${m} — ${doneByMonth[m].length}个已完成</td></tr>`;
             doneByMonth[m].forEach(t => {
+              const isMemberDone = t.resourceId !== member.id && (t.memberIds || []).includes(member.id);
               html += `<tr class="${pcls} hidden" style="opacity:0.5;text-decoration:line-through">
                 <td><a style="color:#1976d2;cursor:pointer" onclick="showPage('project-detail','${t.projectId}')">${esc(t.projectName)}</a></td>
-                <td>${'　'.repeat(t.level || 0)}${esc(t.name)}</td>
+                <td>${'　'.repeat(t.level || 0)}${esc(t.name)}${isMemberDone ? ' <span style="font-size:10px;color:#888;background:#f0f0f0;padding:1px 4px;border-radius:3px">成员</span>' : ''}</td>
+                <td>${quadrantBadge(t.priorityQuadrant)}${taskTypeBadges(t)}</td>
                 <td>${t.startDate || '-'}</td>
                 <td>${t.endDate || '-'}</td>
                 <td>${t.progress || 0}%</td>
@@ -1474,21 +1984,14 @@ async function submitAssignTask(resourceId) {
   if (!name) return alert('请输入任务名称');
   if (!projectId) return alert('请选择所属项目');
 
-  const proj = await api('/api/projects/' + projectId);
-  const newTask = {
-    id: 't' + Date.now(),
-    name: name,
-    parentId: null,
-    resourceId: resourceId,
-    memberIds: [],
-    startDate: startDate,
-    endDate: endDate,
-    duration: startDate && endDate ? Math.ceil((new Date(endDate) - new Date(startDate)) / (1000*60*60*24)) : 1,
-    progress: 0,
-    predecessors: [],
-    level: 0,
-    completed: false
-  };
+  const proj = normalizeProject(await api('/api/projects/' + projectId));
+  const newTask = createDefaultTask({
+    name,
+    resourceId,
+    startDate,
+    endDate,
+    duration: startDate && endDate ? Math.max(1, Math.ceil((new Date(endDate) - new Date(startDate)) / (1000*60*60*24))) : 1
+  });
   proj.tasks = proj.tasks || [];
   proj.tasks.push(newTask);
   await api('/api/projects/' + projectId, { method: 'PUT', body: JSON.stringify(proj) });
@@ -1500,16 +2003,17 @@ async function submitAssignTask(resourceId) {
 
 // ===== 人员管理 =====
 async function showPersonnelModal() {
-  const resources = await api('/api/resources') || [];
+  const resources = (await api('/api/resources') || []).map(normalizeResource);
   document.getElementById('modal-content').innerHTML = `
     <h3>人员管理</h3>
     <table style="margin-bottom:12px;font-size:13px">
-      <thead><tr><th>姓名</th><th>部门</th><th style="width:80px">操作</th></tr></thead>
+      <thead><tr><th>姓名</th><th>部门</th><th>人工标记</th><th style="width:110px">操作</th></tr></thead>
       <tbody>
         ${resources.map(r => `
           <tr>
             <td>${esc(r.name)}</td>
             <td>${esc(r.department)}</td>
+            <td>${r.isLoadPerson ? '<span class="person-flag person-flag-load">人工负荷</span>' : ''}${r.isKeyPerson ? '<span class="person-flag person-flag-key">关键人员</span>' : ''} ${!r.isLoadPerson && !r.isKeyPerson ? '-' : ''}</td>
             <td>
               <button class="btn btn-sm" onclick="editPerson('${r.id}')">编辑</button>
               <button class="btn btn-danger btn-sm" onclick="deletePerson('${r.id}')">删除</button>
@@ -1524,6 +2028,12 @@ async function showPersonnelModal() {
     <div class="form-row" style="margin-bottom:8px">
       <label>部门</label><input id="p-dept" placeholder="所属部门">
     </div>
+    <div class="form-row" style="margin-bottom:8px"><label>人工属性</label>
+      <div style="display:flex;gap:12px;align-items:center">
+        <label style="width:auto"><input type="checkbox" id="p-load"> 人工负荷人员</label>
+        <label style="width:auto"><input type="checkbox" id="p-key"> 关键人员</label>
+      </div>
+    </div>
     <div class="form-actions">
       <button class="btn btn-outline" onclick="closeModal()">关闭</button>
       <button class="btn btn-primary" id="btn-save-person">添加</button>
@@ -1533,9 +2043,11 @@ async function showPersonnelModal() {
   document.getElementById('btn-save-person').onclick = async () => {
     const name = document.getElementById('p-name').value.trim();
     const dept = document.getElementById('p-dept').value.trim();
+    const isLoadPerson = document.getElementById('p-load').checked;
+    const isKeyPerson = document.getElementById('p-key').checked;
     if (!name || !dept) return alert('姓名和部门不能为空');
     const newId = 'r' + Date.now();
-    resources.push({ id: newId, name, department: dept });
+    resources.push({ id: newId, name, department: dept, isLoadPerson, isKeyPerson });
     await api('/api/resources', { method: 'PUT', body: JSON.stringify(resources) });
     state.resources = resources;
     closeModal();
@@ -1544,7 +2056,7 @@ async function showPersonnelModal() {
 }
 
 async function editPerson(id) {
-  const resources = await api('/api/resources') || [];
+  const resources = (await api('/api/resources') || []).map(normalizeResource);
   const person = resources.find(r => r.id === id);
   if (!person) return;
   document.getElementById('modal-content').innerHTML = `
@@ -1555,6 +2067,12 @@ async function editPerson(id) {
     <div class="form-row" style="margin-bottom:8px">
       <label>部门</label><input id="p-dept" value="${esc(person.department)}">
     </div>
+    <div class="form-row" style="margin-bottom:8px"><label>人工属性</label>
+      <div style="display:flex;gap:12px;align-items:center">
+        <label style="width:auto"><input type="checkbox" id="p-load" ${person.isLoadPerson ? 'checked' : ''}> 人工负荷人员</label>
+        <label style="width:auto"><input type="checkbox" id="p-key" ${person.isKeyPerson ? 'checked' : ''}> 关键人员</label>
+      </div>
+    </div>
     <div class="form-actions">
       <button class="btn btn-outline" onclick="showPersonnelModal()">取消</button>
       <button class="btn btn-primary" id="btn-update-person">保存</button>
@@ -1563,6 +2081,8 @@ async function editPerson(id) {
   document.getElementById('btn-update-person').onclick = async () => {
     person.name = document.getElementById('p-name').value.trim();
     person.department = document.getElementById('p-dept').value.trim();
+    person.isLoadPerson = document.getElementById('p-load').checked;
+    person.isKeyPerson = document.getElementById('p-key').checked;
     if (!person.name || !person.department) return alert('姓名和部门不能为空');
     await api('/api/resources', { method: 'PUT', body: JSON.stringify(resources) });
     state.resources = resources;
@@ -1594,8 +2114,11 @@ async function renderDashboard() {
   const allEarlyTasks = [];
   let earlyCount = 0;
 
-  for (const proj of activeProjects) {
-    const detail = await api(`/api/projects/${proj.id}`);
+  // 批量获取项目详情（避免N+1）
+  const activeIds = activeProjects.map(p => p.id).join(',');
+  const projectDetails = activeIds ? (await api(`/api/projects/batch?ids=${activeIds}`)).map(normalizeProject) : [];
+  for (const proj of projectDetails) {
+    const detail = proj;
     const tasks = detail.tasks || [];
     let projRisk = 0;
     const riskTasks = [];
@@ -1636,13 +2159,15 @@ async function renderDashboard() {
     if (projRisk > 0) atRisk++;
     totalTasks += tasks.length;
 
+    const completedTasks = tasks.filter(t => t.completed === true).length;
+    const projProgress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
     const projStart = new Date(proj.startDate);
     const projEnd = new Date(proj.endDate);
     const projTotal = (projEnd - projStart) / (1000*60*60*24);
     const projElapsed = (today - projStart) / (1000*60*60*24);
     const timeProgress = projTotal > 0 ? Math.max(0, Math.min(100, Math.round(projElapsed / projTotal * 100))) : 0;
 
-    projectCards.push({ ...proj, riskTasks, projRisk, timeProgress });
+    projectCards.push({ ...proj, tasks, riskTasks, projRisk, timeProgress, progress: projProgress, completedTasks, totalTasks: tasks.length });
   }
 
   // 统计
@@ -1653,7 +2178,6 @@ async function renderDashboard() {
     <div class="stat-item"><div class="stat-value" style="color:#2e7d32">${earlyCount}</div><div class="stat-label">提前完成任务</div></div>
   `;
 
-  // 项目卡片
   document.getElementById('dashboard-grid').innerHTML = projectCards.map(p => {
     const riskBadge = p.projRisk > 0 ? `<span style="color:#c62828;font-weight:600">⚠${p.projRisk}个风险</span>` : '<span style="color:#2e7d32">✓正常</span>';
     const progressColor = p.progress >= 100 ? '#2e7d32' : '#1976d2';
@@ -1685,8 +2209,32 @@ async function renderDashboard() {
     </div>`;
   }).join('');
 
-  // 风险 + 提前完成 汇总
-  const resources = await api('/api/resources') || [];
+  const quadrantProjects = { q1: [], q2: [], q3: [], q4: [], unset: [] };
+  const allDashboardTasks = [];
+  projectCards.forEach(p => {
+    quadrantProjects[normalizeQuadrant(p.priorityQuadrant)].push(p);
+    (p.tasks || []).filter(t => !t.completed).forEach(t => allDashboardTasks.push({ ...t, projectName: p.name, projectId: p.id }));
+  });
+  const quadrantCell = (key, title, items, limit, renderItem) => `
+    <div class="quadrant-cell quadrant-cell-${key}">
+      <h4><span>${PRIORITY_QUADRANTS[key].short} ${title}</span><span style="font-size:11px;color:#777">${Math.min(items.length, limit)}/${items.length}</span></h4>
+      ${items.slice(0, limit).map(renderItem).join('') || '<div style="color:#999;font-size:12px">暂无</div>'}
+      ${items.length > limit ? `<div style="color:#777;font-size:11px;margin-top:6px">还有 ${items.length-limit} 项</div>` : ''}
+    </div>`;
+  document.getElementById('dashboard-quadrants').innerHTML = `
+    <section class="dashboard-block"><h3>项目四象限</h3><div class="quadrant-board">
+      ${['q1','q2','q3','q4'].map(k => quadrantCell(k, PRIORITY_QUADRANTS[k].label, quadrantProjects[k], 50, p => `<div class="quadrant-item"><a style="color:#1976d2;cursor:pointer;font-weight:600" onclick="showPage('project-detail','${p.id}')">${esc(p.name)}</a> ${quadrantBadge(p.priorityQuadrant)}<div style="color:#777;margin-top:3px">任务 ${p.completedTasks}/${p.totalTasks} · 风险 ${p.projRisk}</div></div>`)).join('')}
+    </div>
+    ${quadrantProjects.unset.length ? `<div class="settings-card"><strong>待设置项目 (${quadrantProjects.unset.length})</strong> ${quadrantProjects.unset.map(p => `<a style="margin-left:10px;color:#1976d2;cursor:pointer" onclick="showPage('project-detail','${p.id}')">${esc(p.name)}</a>`).join('')}</div>` : ''}</section>
+    <section class="dashboard-block"><h3>任务四象限</h3><div class="quadrant-board">
+      ${['q1','q2','q3','q4'].map(k => { const items = allDashboardTasks.filter(t => normalizeQuadrant(t.priorityQuadrant) === k).sort(sortByPriorityAndDate); const limit = state.dashboardSettings.quadrantTaskLimits?.[k] || 10; return quadrantCell(k, PRIORITY_QUADRANTS[k].label, items, limit, t => `<div class="quadrant-item"><a style="color:#1976d2;cursor:pointer" onclick="showPage('project-detail','${t.projectId}')">${esc(t.name)}</a> ${taskTypeBadges(t)}<div style="color:#777;margin-top:3px">${esc(t.projectName)} · ${t.endDate || '无结束日期'}</div></div>`); }).join('')}
+    </div>
+    ${allDashboardTasks.filter(t => normalizeQuadrant(t.priorityQuadrant) === 'unset').length ? `<div class="settings-card"><strong>待设置任务 (${allDashboardTasks.filter(t => normalizeQuadrant(t.priorityQuadrant) === 'unset').length})</strong></div>` : ''}</section>`;
+
+  const resources = (await api('/api/resources') || []).map(normalizeResource);
+  const personnelMetrics = buildPersonnelMetrics(resources, projectCards.map(p => ({ ...p, tasks: p.tasks || [] })), state.dashboardSettings);
+  const renderPerson = m => `<div class="person-board-card"><a style="color:#1976d2;cursor:pointer" onclick="showPage('personnel');setTimeout(()=>{const el=document.getElementById('person-filter');if(el){el.value='${m.resource.id}';renderPersonnelView();}},0)">${esc(m.resource.name)}</a><div style="margin-top:4px">${personFlagsHTML(m)}</div><div style="color:#777;margin-top:4px">Q1 ${m.quadrants.q1} · 卡点 ${m.bottleneck} · 当前 ${m.current}</div></div>`;
+  document.getElementById('dashboard-people').innerHTML = `<section class="dashboard-block"><h3>人员看板</h3><div class="person-board">${[['卡点人员', m => m.isBottleneckPerson], ['负荷人员', m => m.isLoadPerson], ['关键人员', m => m.isKeyPerson]].map(([title, fn]) => `<div class="person-board-col"><h4>${title}</h4>${personnelMetrics.filter(fn).map(renderPerson).join('') || '<div style="color:#999;font-size:12px">暂无</div>'}</div>`).join('')}</div></section>`;
   let sectionHtml = '';
 
   // 延期风险
@@ -1749,11 +2297,12 @@ async function showPersonGantt(resourceId) {
   const projects = await api('/api/projects');
   const activeProjects = projects.filter(p => (p.status || 'active') === 'active');
   const allTasks = [];
-  for (const proj of activeProjects) {
-    const detail = await api(`/api/projects/${proj.id}`);
+  const ganttIds = activeProjects.map(p => p.id).join(',');
+  const ganttDetails = ganttIds ? await api(`/api/projects/batch?ids=${ganttIds}`) : [];
+  for (const detail of ganttDetails) {
     (detail.tasks || []).forEach(t => {
-      if (t.resourceId === resourceId) {
-        allTasks.push({ ...t, projectName: proj.name, projectId: proj.id });
+      if (t.resourceId === resourceId || (t.memberIds || []).includes(resourceId)) {
+        allTasks.push({ ...t, projectName: detail.name, projectId: detail.id });
       }
     });
   }
@@ -1767,20 +2316,12 @@ async function showPersonGantt(resourceId) {
   }
 
   // 计算甘特图时间范围，对齐到周一/周日
-  let minDate = null, maxDate = null;
-  allTasks.forEach(t => {
-    if (t.startDate) { const d = new Date(t.startDate); if (!minDate || d < minDate) minDate = d; }
-    if (t.endDate) { const d = new Date(t.endDate); if (!maxDate || d > maxDate) maxDate = d; }
-  });
-  if (!minDate) minDate = new Date();
-  if (!maxDate) maxDate = new Date();
-  // 对齐到周一
-  const dow0 = minDate.getDay();
-  minDate = new Date(minDate); minDate.setDate(minDate.getDate() - (dow0 === 0 ? 6 : dow0 - 1));
+  const { minDate: rawMin2, maxDate: rawMax2 } = ganttDateRange(allTasks);
+  const dow0 = rawMin2.getDay();
+  const minDate = new Date(rawMin2); minDate.setDate(minDate.getDate() - (dow0 === 0 ? 6 : dow0 - 1));
   minDate.setHours(0,0,0,0);
-  // 对齐到周日
-  const dow1 = maxDate.getDay();
-  maxDate = new Date(maxDate); maxDate.setDate(maxDate.getDate() + (dow1 === 0 ? 0 : 7 - dow1));
+  const dow1 = rawMax2.getDay();
+  const maxDate = new Date(rawMax2); maxDate.setDate(maxDate.getDate() + (dow1 === 0 ? 0 : 7 - dow1));
   maxDate.setHours(0,0,0,0);
 
   const weekMs = 1000 * 60 * 60 * 24 * 7;
@@ -1795,22 +2336,9 @@ async function showPersonGantt(resourceId) {
 
   let svgHtml = `<svg width="${width}" height="${svgH}" viewBox="0 0 ${width} ${svgH}" style="width:100%;height:${svgH}px">`;
 
-  // 月份刻度行 (y=0~26)
-  const months = [];
-  let cursor = new Date(minDate);
-  while (cursor <= maxDate) {
-    months.push(new Date(cursor));
-    cursor.setMonth(cursor.getMonth() + 1);
-  }
-  months.forEach((m, i) => {
-    const startX = leftPad + ((m - minDate) / weekMs) * weekWidth;
-    const endX = i < months.length - 1
-      ? leftPad + ((months[i+1] - minDate) / weekMs) * weekWidth
-      : width;
-    const w = endX - startX;
-    svgHtml += `<rect x="${startX}" y="0" width="${w}" height="26" fill="${i%2===0?'#e8ecf1':'#f5f6f8'}" stroke="#d0d0d0" stroke-width="0.5"/>`;
-    svgHtml += `<text x="${startX + w/2}" y="17" text-anchor="middle" font-size="13" font-weight="bold" fill="#444">${m.getFullYear()}年${m.getMonth()+1}月</text>`;
-  });
+  // 月份刻度行（使用共享函数）
+  const weekFn = (d) => leftPad + ((d - minDate) / weekMs) * weekWidth;
+  svgHtml += ganttMonthHeaders(minDate, maxDate, width, weekFn, leftPad, 26);
 
   // 周号行 (y=26~44)
   for (let w = 0; w < totalWeeks; w++) {
@@ -1821,14 +2349,9 @@ async function showPersonGantt(resourceId) {
     svgHtml += `<text x="${wx + weekWidth/2}" y="39" text-anchor="middle" font-size="10" fill="#999">W${weekNum}</text>`;
   }
 
-  // 今天线
+  // 今天线（使用共享函数）
   const today = new Date(); today.setHours(0,0,0,0);
-  if (today >= minDate && today <= maxDate) {
-    const todayOffset = (today - minDate) / weekMs;
-    const tx = leftPad + todayOffset * weekWidth;
-    svgHtml += `<line x1="${tx}" y1="${headerH}" x2="${tx}" y2="${svgH}" stroke="#e53935" stroke-width="2" stroke-dasharray="6,3"/>`;
-    svgHtml += `<text x="${tx}" y="${headerH + 12}" text-anchor="middle" font-size="11" fill="#e53935" font-weight="bold">今天</text>`;
-  }
+  svgHtml += ganttTodayLine(today, minDate, maxDate, weekFn, leftPad, svgH, headerH);
 
   // 任务条
   allTasks.forEach((t, i) => {
@@ -1853,8 +2376,6 @@ async function showPersonGantt(resourceId) {
   svgHtml += '</svg>';
   document.getElementById('person-gantt-container').innerHTML = svgHtml;
 }
-
-function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function getWeekNumber(d) {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1890,6 +2411,28 @@ async function verifyPassword() {
   document.getElementById('settings-content').style.display = '';
   loadWhitelist();
   loadTemplateList();
+  loadDashboardSettings().then(fillDashboardSettings);
+}
+
+function fillDashboardSettings(settings = state.dashboardSettings) {
+  const q = settings.quadrantTaskLimits || {};
+  const values = { 'set-q1': q.q1, 'set-q2': q.q2, 'set-q3': q.q3, 'set-q4': q.q4, 'set-load': settings.loadQ1Threshold, 'set-key': settings.keyQ1Threshold, 'set-bottleneck': settings.keyBottleneckThreshold };
+  Object.keys(values).forEach(id => { const el = document.getElementById(id); if (el) el.value = values[id]; });
+}
+
+async function saveDashboardSettings() {
+  const payload = {
+    password: '14',
+    quadrantTaskLimits: { q1: +document.getElementById('set-q1').value, q2: +document.getElementById('set-q2').value, q3: +document.getElementById('set-q3').value, q4: +document.getElementById('set-q4').value },
+    loadQ1Threshold: +document.getElementById('set-load').value,
+    keyQ1Threshold: +document.getElementById('set-key').value,
+    keyBottleneckThreshold: +document.getElementById('set-bottleneck').value
+  };
+  const result = await api('/api/settings/dashboard', { method: 'PUT', body: JSON.stringify(payload) });
+  if (result.error) return alert(result.error);
+  state.dashboardSettings = result;
+  alert('看板设置已保存');
+  if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
 }
 
 async function loadWhitelist() {
@@ -2060,7 +2603,7 @@ setInterval(() => {
   updateToday();
   if (state.currentProject && document.getElementById('page-project-detail').classList.contains('active')) {
     // 每30秒更新时间进度列
-    const timeCells = document.querySelectorAll('#task-table tbody td:nth-child(8)');
+    const timeCells = document.querySelectorAll('#task-table tbody td:nth-child(10)');
     const tasks = state.currentProject.tasks;
     timeCells.forEach(td => {
       const tr = td.closest('tr');

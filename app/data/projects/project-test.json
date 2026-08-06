@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 2,
+  "id": "project-test",
+  "name": "📋 功能测试项目",
+  "description": "包含各种任务状态、优先级、成员分配的综合测试项目",
+  "startDate": "2026-08-01",
+  "endDate": "2026-09-30",
+  "status": "active",
+  "priorityQuadrant": "q1",
+  "tasks": [
+    {
+      "id": "tt1",
+      "name": "需求分析与评审",
+      "parentId": null,
+      "resourceId": "r9",
+      "memberIds": [
+        "r1",
+        "r10"
+      ],
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-10",
+      "duration": 7,
+      "progress": 100,
+      "predecessors": [],
+      "level": 0,
+      "completed": true,
+      "onHold": false,
+      "actualCompletionDate": "2026-08-08",
+      "priorityQuadrant": "q1",
+      "isBottleneck": false,
+      "isMilestone": true
+    },
+    {
+      "id": "tt2",
+      "name": "系统架构设计",
+      "parentId": null,
+      "resourceId": "r1",
+      "memberIds": [
+        "r2",
+        "r3"
+      ],
+      "startDate": "2026-08-05",
+      "endDate": "2026-08-20",
+      "duration": 12,
+      "progress": 80,
+      "predecessors": [
+        "tt1"
+      ],
+      "level": 0,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q1",
+      "isBottleneck": false,
+      "isMilestone": true
+    },
+    {
+      "id": "tt3",
+      "name": "硬件原理图设计",
+      "parentId": "tt2",
+      "resourceId": "r2",
+      "memberIds": [
+        "r1"
+      ],
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-25",
+      "duration": 12,
+      "progress": 20,
+      "predecessors": [],
+      "level": 1,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q1",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt4",
+      "name": "PCB Layout",
+      "parentId": "tt2",
+      "resourceId": "r2",
+      "memberIds": [
+        "r5"
+      ],
+      "startDate": "2026-08-18",
+      "endDate": "2026-09-05",
+      "duration": 13,
+      "progress": 80,
+      "predecessors": [
+        "tt3"
+      ],
+      "level": 1,
+      "completed": false,
+      "onHold": true,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q2",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt5",
+      "name": "固件开发",
+      "parentId": null,
+      "resourceId": "r3",
+      "memberIds": [
+        "r4"
+      ],
+      "startDate": "2026-08-15",
+      "endDate": "2026-09-15",
+      "duration": 24,
+      "progress": 100,
+      "predecessors": [],
+      "level": 0,
+      "completed": true,
+      "onHold": false,
+      "actualCompletionDate": "2026-08-06",
+      "priorityQuadrant": "q1",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt6",
+      "name": "BSP 驱动适配",
+      "parentId": "tt5",
+      "resourceId": "r3",
+      "memberIds": [],
+      "startDate": "2026-08-15",
+      "endDate": "2026-08-30",
+      "duration": 11,
+      "progress": 60,
+      "predecessors": [],
+      "level": 1,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q2",
+      "isBottleneck": true,
+      "isMilestone": false
+    },
+    {
+      "id": "tt7",
+      "name": "应用层开发",
+      "parentId": "tt5",
+      "resourceId": "r4",
+      "memberIds": [
+        "r3"
+      ],
+      "startDate": "2026-08-20",
+      "endDate": "2026-09-15",
+      "duration": 19,
+      "progress": 0,
+      "predecessors": [
+        "tt6"
+      ],
+      "level": 1,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q3",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt8",
+      "name": "结构设计",
+      "parentId": null,
+      "resourceId": "r5",
+      "memberIds": [],
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-15",
+      "duration": 10,
+      "progress": 0,
+      "predecessors": [],
+      "level": 0,
+      "completed": false,
+      "onHold": true,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q2",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt9",
+      "name": "外壳开模",
+      "parentId": "tt8",
+      "resourceId": "r5",
+      "memberIds": [
+        "r7"
+      ],
+      "startDate": "2026-08-16",
+      "endDate": "2026-09-10",
+      "duration": 18,
+      "progress": 0,
+      "predecessors": [],
+      "level": 1,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q2",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt10",
+      "name": "测试方案编写",
+      "parentId": null,
+      "resourceId": "r6",
+      "memberIds": [
+        "r1",
+        "r2",
+        "r3"
+      ],
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-20",
+      "duration": 8,
+      "progress": 100,
+      "predecessors": [],
+      "level": 0,
+      "completed": true,
+      "onHold": false,
+      "actualCompletionDate": "2026-08-18",
+      "priorityQuadrant": "q3",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt11",
+      "name": "硬件测试",
+      "parentId": null,
+      "resourceId": "r6",
+      "memberIds": [
+        "r1",
+        "r2"
+      ],
+      "startDate": "2026-08-25",
+      "endDate": "2026-09-10",
+      "duration": 12,
+      "progress": 0,
+      "predecessors": [
+        "tt4"
+      ],
+      "level": 0,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q1",
+      "isBottleneck": false,
+      "isMilestone": false
+    },
+    {
+      "id": "tt12",
+      "name": "物料采购",
+      "parentId": null,
+      "resourceId": "r7",
+      "memberIds": [],
+      "startDate": "2026-07-25",
+      "endDate": "2026-08-08",
+      "duration": 10,
+      "progress": 0,
+      "predecessors": [],
+      "level": 0,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q1",
+      "isBottleneck": true,
+      "isMilestone": false
+    },
+    {
+      "id": "tt13",
+      "name": "样品组装",
+      "parentId": null,
+      "resourceId": "r1",
+      "memberIds": [
+        "r2",
+        "r5",
+        "r6"
+      ],
+      "startDate": "2026-09-10",
+      "endDate": "2026-09-20",
+      "duration": 8,
+      "progress": 0,
+      "predecessors": [
+        "tt9",
+        "tt11"
+      ],
+      "level": 0,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q2",
+      "isBottleneck": false,
+      "isMilestone": true
+    },
+    {
+      "id": "tt14",
+      "name": "项目文档整理",
+      "parentId": null,
+      "resourceId": "r8",
+      "memberIds": [],
+      "startDate": "2026-09-15",
+      "endDate": "2026-09-30",
+      "duration": 12,
+      "progress": 0,
+      "predecessors": [],
+      "level": 0,
+      "completed": false,
+      "onHold": false,
+      "actualCompletionDate": "",
+      "priorityQuadrant": "q4",
+      "isBottleneck": false,
+      "isMilestone": false
+    }
+  ]
+}

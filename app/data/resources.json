@@ -2,51 +2,71 @@
   {
     "id": "r1",
     "name": "张工",
-    "department": "硬件部"
+    "department": "硬件部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r2",
     "name": "李工",
-    "department": "硬件部"
+    "department": "硬件部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r3",
     "name": "王工",
-    "department": "软件部"
+    "department": "软件部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r4",
     "name": "赵工",
-    "department": "软件部"
+    "department": "软件部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r5",
     "name": "陈工",
-    "department": "结构部"
+    "department": "结构部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r6",
     "name": "刘工",
-    "department": "测试部"
+    "department": "测试部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r7",
     "name": "周工",
-    "department": "采购部"
+    "department": "采购部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r8",
     "name": "吴工",
-    "department": "项目管理部"
+    "department": "项目管理部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   },
   {
     "id": "r1785326846170",
     "name": "唐孝林",
-    "department": "产品部"
+    "department": "产品部",
+    "isLoadPerson": false,
+    "isKeyPerson": true
   },
   {
     "id": "r1785326861108",
     "name": "雷",
-    "department": "产品部"
+    "department": "产品部",
+    "isLoadPerson": false,
+    "isKeyPerson": false
   }
 ]

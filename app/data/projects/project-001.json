@@ -4,6 +4,8 @@
   "description": "120kW-240kW 3C快充一体双枪充电桩，从方案到量产全流程",
   "startDate": "2026-05-01",
   "endDate": "2026-12-31",
+  "status": "active",
+  "priorityQuadrant": "q1",
   "tasks": [
     {
       "id": "t1",
@@ -16,7 +18,13 @@
       "progress": 100,
       "predecessors": [],
       "level": 0,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t2",
@@ -29,7 +37,13 @@
       "progress": 100,
       "predecessors": [],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t3",
@@ -44,7 +58,13 @@
         "t2"
       ],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t4",
@@ -59,7 +79,13 @@
         "t3"
       ],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t5",
@@ -74,7 +100,13 @@
         "t2"
       ],
       "level": 0,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "q2",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t6",
@@ -89,7 +121,13 @@
         "t1"
       ],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t7",
@@ -104,7 +142,13 @@
         "t6"
       ],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t9",
@@ -124,7 +168,12 @@
         "r2",
         "r3"
       ],
-      "completed": true
+      "completed": true,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t10",
@@ -139,7 +188,14 @@
         "t8",
         "t9"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "q1",
+      "isBottleneck": true,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t11",
@@ -149,11 +205,18 @@
       "startDate": "2026-07-01",
       "endDate": "2026-11-15",
       "duration": 99,
-      "progress": 40,
+      "progress": 100,
       "predecessors": [
         "t1"
       ],
-      "level": 0
+      "level": 0,
+      "memberIds": [],
+      "completed": true,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "2026-08-06",
+      "onHold": false
     },
     {
       "id": "t12",
@@ -167,7 +230,16 @@
       "predecessors": [
         "t1"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [
+        "r1"
+      ],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t13",
@@ -181,7 +253,14 @@
       "predecessors": [
         "t12"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t14",
@@ -195,7 +274,14 @@
       "predecessors": [
         "t13"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t15",
@@ -209,7 +295,14 @@
       "predecessors": [
         "t1"
       ],
-      "level": 0
+      "level": 0,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t16",
@@ -224,7 +317,13 @@
         "t1"
       ],
       "level": 1,
-      "completed": true
+      "completed": true,
+      "memberIds": [],
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t17",
@@ -238,7 +337,14 @@
       "predecessors": [
         "t16"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t18",
@@ -252,7 +358,14 @@
       "predecessors": [
         "t17"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t19",
@@ -268,7 +381,14 @@
         "t11",
         "t15"
       ],
-      "level": 0
+      "level": 0,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t20",
@@ -284,7 +404,14 @@
         "t11",
         "t15"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t21",
@@ -298,7 +425,14 @@
       "predecessors": [
         "t20"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t22",
@@ -312,7 +446,14 @@
       "predecessors": [
         "t19"
       ],
-      "level": 0
+      "level": 0,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     },
     {
       "id": "t23",
@@ -326,8 +467,15 @@
       "predecessors": [
         "t6"
       ],
-      "level": 1
+      "level": 1,
+      "memberIds": [],
+      "completed": false,
+      "priorityQuadrant": "unset",
+      "isBottleneck": false,
+      "isMilestone": false,
+      "actualCompletionDate": "",
+      "onHold": false
     }
   ],
-  "status": "active"
+  "schemaVersion": 2
 }
